@@ -1,7 +1,9 @@
 // src/pages/LandingPage.jsx
 import React, { useState } from 'react';
 import image from '../assets/AiPoweredImage.png';
-import Button from '../components/common/button'; // uses your custom Button (name, bgColor, color, ...)
+import Button from '../components/common/Button.jsx';
+import hero from '../assets/hero.png';
+import heroSm from '../assets/hero2.png';
 import {
     BookOpen,
     Brain,
@@ -15,12 +17,15 @@ import {
     Twitter,
     Linkedin,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 export default function LandingPage() {
+    const navigate = useNavigate();
     const categories = [
         {
             key: 'Notes',
             title: 'Smart Note Taking',
+            text: 'Turn lectures, PDFs, and web pages into clean, structured notes in seconds. Auto-highlight key ideas and keep everything organized by topic, source, and tags.',
             desc: [
                 'Auto-summarize long texts',
                 'Highlight key concepts',
@@ -31,42 +36,46 @@ export default function LandingPage() {
         {
             key: 'Flashcards',
             title: 'AI Flashcards',
+            text: 'Generate high-quality flashcards from any note or upload with one click. Study smarter with spaced repetition and quick review sessions that adapt to you.',
             desc: [
                 'Instantly generate flashcards',
                 'Spaced repetition learning',
                 'Engage with quizzes',
             ],
-            img: '/images/flashcards.png',
+            img: image,
         },
         {
             key: 'Quizzes',
             title: 'Auto Quizzes',
+            text: 'Create exam-style MCQs and short-answer quizzes tailored to your material. Get feedback, explanations, and difficulty that scales with your performance.',
             desc: [
                 'Generate MCQs instantly',
                 'Track progress & accuracy',
                 'Adaptive difficulty levels',
             ],
-            img: '/images/quizzes.png',
+            img: image,
         },
         {
             key: 'Summaries',
             title: 'AI Summaries',
+            text: 'Condense chapters, research papers, and lessons into crisp summaries. Choose bullet points, study sheets, or paragraph format—always with citations.',
             desc: [
                 'Condense lengthy texts',
                 'Key point extraction',
                 'Multiple summary styles',
             ],
-            img: '/images/summaries.png',
+            img: image,
         },
         {
             key: 'AI Tutor',
             title: 'Personal AI Tutor',
+            text: 'Ask anything and get step-by-step explanations, examples, and analogies in your tone. Practice with hints, scaffolded reasoning, and follow-up questions.',
             desc: [
                 'Ask any question',
                 'Step-by-step explanations',
                 '24/7 instant guidance',
             ],
-            img: '/images/tutor.png',
+            img: image,
         },
     ];
     const plans = [
@@ -136,7 +145,7 @@ export default function LandingPage() {
     const [activeCategory, setActiveCategory] = useState(categories[0]);
 
     return (
-        <div className="min-h-screen flex flex-col font-sans text-slate-800">
+        <div className="min-h-screen flex flex-col font-sans text-slate-800 dark:bg-zinc-900">
             {/* Navbar */}
             <header className="w-full sticky top-0 z-50 backdrop-blur border-gray-700 border-b-[0.1px]">
                 <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
@@ -165,26 +174,36 @@ export default function LandingPage() {
                         ))}
                     </nav>
                     <div className="hidden md:block min-w-[140px]">
-                        <Button name="Get Started" bgColor="#4f46e5" />
+                        <Button
+                            onClick={()=>navigate('/login')}
+                            name="Get Started"
+                            bgColor="#4f46e5"
+                        />
                     </div>
                     <div className="md:hidden">
-                        <Button name="Get Started" bgColor="#4f46e5" />
+                        <Button
+                            onClick={()=>navigate('/login')}
+                            name="Get Started"
+                            bgColor="#4f46e5"
+                            width="7rem"
+                        />
                     </div>
                 </div>
             </header>
 
             {/* Hero Section */}
-            <section id="home" className="relative overflow-hidden">
-                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600" />
-                <div
-                    className="absolute inset-0 -z-10 opacity-20"
-                    style={{
-                        backgroundImage:
-                            'radial-gradient(800px 300px at 10% 20%, rgba(255,255,255,0.35), transparent), radial-gradient(600px 300px at 90% 60%, rgba(255,255,255,0.2), transparent)',
-                    }}
-                />
-
-                <div className="max-w-7xl mx-auto px-6 md:px-10 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+            <section
+                id="home"
+                className="relative overflow-hidden bg-cover bg-center bg-no-repeat"
+                style={{
+                    backgroundImage: `url(${
+                        window.innerWidth < 768 ? heroSm : hero
+                    })`, // replace with your image path
+                }}
+            >
+                <div className="absolute bg-black/40" />{' '}
+                {/* Optional dark overlay */}
+                <div className=" backdrop-blur-sm max-w-7xl mx-auto px-6 md:px-10 py-24 md:py-28 grid md:grid-cols-2 gap-12 items-center">
                     <div className="text-white">
                         <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
                             Unlock Smarter Learning
@@ -192,7 +211,7 @@ export default function LandingPage() {
                             With <span className="text-yellow-300">AI</span>
                         </h1>
                         <p className="mt-6 text-lg md:text-xl text-slate-100/90 max-w-2xl">
-                            Transform your study routine with AI‑powered tools.
+                            Transform your study routine with AI-powered tools.
                             Generate notes, flashcards, quizzes, summaries, and
                             get personalized tutoring—all in one platform.
                         </p>
@@ -271,37 +290,28 @@ export default function LandingPage() {
                     </div>
 
                     {/* Active Tab Panel */}
-                    <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
+                    <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-center font-bold">
                         {/* Left side */}
                         <div>
                             <h4 className="text-2xl font-semibold mb-4 text-slate-900 dark:text-white">
                                 {activeCategory.title}
                             </h4>
-                            <ul className="space-y-2 mb-6">
+                            <p className=" font-semibold dark:text-[#a3a3a3] text-slate-700 mb-4">
+                                {activeCategory.text}
+                            </p>
+                            <ul className="space-y-2 mb-6 font-semibold">
                                 {activeCategory.desc.map((d, i) => (
                                     <li
                                         key={i}
-                                        className="flex items-start gap-2 text-slate-700 dark:text-slate-300"
+                                        className="flex items-start gap-2 text-slate-700 dark:text-[#a3a3a3]"
                                     >
-                                        <span className="text-green-500">
+                                        <span className="dark:text-[#a3a3a3] text-slate-700">
                                             ✓
                                         </span>{' '}
                                         {d}
                                     </li>
                                 ))}
                             </ul>
-                            <div className="flex gap-3">
-                                <Button
-                                    name={`Try ${activeCategory}`}
-                                    bgColor="#4f46e5"
-                                    color="#fff"
-                                />
-                                <Button
-                                    name="See Docs"
-                                    bgColor="#e2e8f0"
-                                    color="#0f172a"
-                                />
-                            </div>
                         </div>
 
                         {/* Right side (Image) */}
@@ -317,12 +327,15 @@ export default function LandingPage() {
             </section>
 
             {/* Why Us / Specialties */}
-            <section id="specialties" className="py-20 bg-zinc-900 text-white">
+            <section
+                id="specialties"
+                className="py-20 dark:bg-zinc-900 dark:text-white"
+            >
                 <div className="max-w-7xl mx-auto px-6">
-                    <h3 className="text-3xl md:text-4xl font-bold text-center mb-4">
+                    <h3 className="text-3xl md:text-4xl font-bold text-center mb-4 border-slate-200 bg-white dark:bg-zinc-900 dark:border-slate-800">
                         Why Choose AI Learn?
                     </h3>
-                    <p className="text-slate-400 text-center max-w-2xl mx-auto mb-12">
+                    <p className="text-slate-600 dark:text-slate-300 text-center max-w-2xl mx-auto mb-12">
                         Experience the future of learning with cutting-edge AI
                         technology designed for your success
                     </p>
@@ -330,47 +343,41 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-3 gap-6">
                         {[
                             {
-                                title: 'Fastest Revision',
-                                desc: 'Condense hours of study into minutes with AI-powered skimming and summarization.',
-                                icon: '🚀',
+                                title: 'AI-Powered Summaries',
+                                desc: 'Convert long topics into short, easy-to-understand summaries instantly.',
                             },
                             {
-                                title: 'Subject Agnostic',
-                                desc: 'From math to medicine, learn any subject with specialized AI assistance.',
-                                icon: '📚',
-                            },
-                            {
-                                title: 'Personalized AI Tutor',
-                                desc: 'Get tailored explanations and guidance based on your unique learning style.',
-                                icon: '🎯',
-                            },
-                            {
-                                title: 'Real Exam Practice',
-                                desc: 'Practice with AI-generated questions modeled after actual exams and certifications.',
-                                icon: '📝',
+                                title: 'Smart Flashcards',
+                                desc: 'Auto-generate flashcards & quizzes for effective revision.',
                             },
                             {
                                 title: 'Share & Import',
-                                desc: 'Collaborate with peers and import resources from anywhere in seconds.',
-                                icon: '🌍',
+                                desc: 'Easily share or import subjects & topics with unique IDs.',
                             },
                             {
-                                title: 'Analytics',
-                                desc: 'Track your progress with detailed insights on learning patterns and improvement areas.',
-                                icon: '📊',
+                                title: 'Personalized Learning',
+                                desc: 'Get study suggestions based on your weak areas.',
+                            },
+                            {
+                                title: 'Cross-Device Sync',
+                                desc: 'Access your notes seamlessly across all devices.',
+                            },
+                            {
+                                title: 'Offline Mode',
+                                desc: 'Study anywhere, anytime without internet.',
                             },
                         ].map(({ title, desc, icon }) => (
                             <div
                                 key={title}
-                                className="bg-gradient-to-br from-[#0f0f1c] to-[#1a1a2e] rounded-2xl p-6 md:p-8 shadow-lg hover:shadow-xl transition relative"
+                                className="bg-gradient-to-br from-[#f8fbff] to-[#eef3ff]  dark:bg-gradient-to-br dark:from-[#15151f] dark:to-[#0f0f1c] rounded-2xl p-6 md:p-8 border-[1px] border-gray-300 dark:border-gray-800 transition relative"
                             >
                                 <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-tr from-violet-500 to-indigo-500 mb-6 text-2xl">
                                     {icon}
                                 </div>
-                                <h4 className="text-lg font-semibold mb-2">
+                                <h4 className="text-xl font-bold mb-2 dark:text-white">
                                     {title}
                                 </h4>
-                                <p className="text-slate-300">{desc}</p>
+                                <p className="dark:text-slate-300">{desc}</p>
                             </div>
                         ))}
                     </div>
@@ -378,13 +385,13 @@ export default function LandingPage() {
             </section>
 
             {/* Social Testimonials */}
-            <section className="py-20 bg-zinc-900 text-white">
+            <section className="py-20 border-slate-200 bg-white dark:bg-zinc-900 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-6">
                     {/* Heading */}
-                    <h3 className="text-3xl md:text-4xl font-bold text-center mb-2">
+                    <h3 className="text-3xl md:text-4xl dark:text-white font-bold text-center mb-2">
                         Loved by Students
                     </h3>
-                    <p className="text-center text-slate-400 mb-12">
+                    <p className="text-center text-slate-600 dark:text-slate-300 mb-12">
                         Join thousands of students who've transformed their
                         learning with AI Learn
                     </p>
@@ -394,7 +401,7 @@ export default function LandingPage() {
                         {testimonials.map((item, i) => (
                             <article
                                 key={i}
-                                className="p-6 rounded-xl bg-zinc-800 border border-zinc-700 shadow hover:shadow-lg transition"
+                                className="p-6 rounded-xl bg-gradient-to-br from-[#f8fbff] to-[#eef3ff]  dark:bg-gradient-to-br dark:from-[#15151f] dark:to-[#0f0f1c] border-[1px] border-gray-300 dark:border-gray-800 transition"
                             >
                                 <header className="flex items-center gap-4 mb-4">
                                     <img
@@ -403,15 +410,15 @@ export default function LandingPage() {
                                         className="w-12 h-12 rounded-full object-cover"
                                     />
                                     <div>
-                                        <h4 className="font-semibold">
+                                        <h4 className="font-semibold dark:text-white">
                                             {item.name}
                                         </h4>
-                                        <p className="text-xs text-slate-400">
+                                        <p className="text-xs dark:text-slate-400">
                                             {item.role}
                                         </p>
                                     </div>
                                 </header>
-                                <p className="text-sm italic text-slate-300">
+                                <p className="text-sm italic dark:text-slate-300">
                                     "{item.text}"
                                 </p>
                             </article>
@@ -421,13 +428,13 @@ export default function LandingPage() {
             </section>
 
             {/* Pricing Plans */}
-            <section className="py-20 bg-white dark:bg-zinc-900 transition-colors duration-300">
+            <section className="py-20 border-slate-200 bg-white dark:bg-zinc-900 dark:border-slate-800 transition-colors duration-300">
                 <div className="max-w-6xl mx-auto px-6">
                     {/* Heading */}
                     <h2 className="text-3xl md:text-4xl font-bold text-center text-zinc-900 dark:text-white">
                         Pricing Plans
                     </h2>
-                    <p className="text-center text-slate-600 dark:text-slate-400 mt-2 mb-12">
+                    <p className="text-center text-slate-600 dark:text-slate-300 mt-2 mb-12">
                         Choose a plan that fits your study journey
                     </p>
 
@@ -503,13 +510,16 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <footer id="contact" className="bg-slate-950 text-slate-300">
+            <footer
+                id="contact"
+                className="dark:bg-slate-950 dark:text-slate-300"
+            >
                 <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-4 gap-10">
                     <div>
                         <div className="text-xl font-extrabold bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
                             AI Learn
                         </div>
-                        <p className="mt-3 text-sm text-slate-400">
+                        <p className="mt-3 text-sm dark:text-slate-400">
                             Transform your learning with AI‑powered tools
                             designed for modern students.
                         </p>

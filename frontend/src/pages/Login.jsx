@@ -64,10 +64,10 @@ const Login = () => {
     return (
         <>
             {loading && <Loading />}
-            <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-                <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white rounded-xl overflow-hidden shadow-lg">
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-900 px-4">
+                <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white dark:bg-zinc-700 rounded-xl overflow-hidden shadow-lg">
                     {/* Left Image Section */}
-                    <div className="hidden md:flex md:w-1/2 bg-[#0F172A] p-6 items-center justify-center">
+                    <div className="hidden md:flex md:w-1/2 bg-[#0F172A] dark:bg-gray-700 p-6 items-center justify-center">
                         <img
                             src={sideImage}
                             alt="Login Illustration"
@@ -77,10 +77,10 @@ const Login = () => {
 
                     {/* Right Form Section */}
                     <div className="w-full md:w-1/2 p-10">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                             Log in
                         </h2>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">
                             Welcome back to WebTalk
                         </p>
 
@@ -111,7 +111,7 @@ const Login = () => {
                             <div className="flex justify-end items-center mb-6">
                                 <a
                                     href="#"
-                                    className="text-sm text-blue-600 font-medium"
+                                    className="text-sm text-blue-600 dark:text-blue-400 font-medium"
                                 >
                                     Forgot Password?
                                 </a>
@@ -123,11 +123,11 @@ const Login = () => {
 
                         {/* Divider */}
                         <div className="my-4 flex items-center">
-                            <hr className="flex-grow border-t border-gray-300" />
-                            <span className="mx-2 text-gray-400 text-sm">
+                            <hr className="flex-grow border-t border-gray-300 dark:border-gray-600" />
+                            <span className="mx-2 text-gray-400 dark:text-gray-500 text-sm">
                                 or
                             </span>
-                            <hr className="flex-grow border-t border-gray-300" />
+                            <hr className="flex-grow border-t border-gray-300 dark:border-gray-600" />
                         </div>
 
                         {/* Sign Up Redirect */}

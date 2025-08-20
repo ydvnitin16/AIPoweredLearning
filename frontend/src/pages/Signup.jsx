@@ -68,11 +68,11 @@ const Signup = () => {
     return (
         <>
             {loading && <Loading />}
-            <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-                <div className="flex flex-col md:flex-row w-full max-w-5xl bg-white rounded-xl overflow-hidden shadow-lg">
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-900 px-4">
+                <div className="flex flex-col md:flex-row w-full dark:bg-zinc-700 max-w-5xl bg-white rounded-xl overflow-hidden shadow-lg">
                     {/* Left: Register Form */}
-                    <div className="w-full md:w-1/2 p-8 sm:p-10">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    <div className="w-full md:w-1/2 p-8 dark:bg-zinc-700 sm:p-10">
+                        <h2 className="text-2xl font-bold dark:text-white text-gray-800 mb-6">
                             Register Now
                         </h2>
 
@@ -118,7 +118,7 @@ const Signup = () => {
                                     className="mr-2 cursor-pointer"
                                     required
                                 />
-                                <span>
+                                <span className='dark:text-white'>
                                     I accept the{' '}
                                     <Link
                                         to="/login"
@@ -140,7 +140,7 @@ const Signup = () => {
                         </form>
 
                         {/* Login Redirect */}
-                        <p className="text-sm text-center mt-6 text-gray-600">
+                        <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-300">
                             Already have an account?{' '}
                             <Link
                                 to="/login"
@@ -153,7 +153,7 @@ const Signup = () => {
 
                     {/* Right: Banner Section */}
                     <div
-                        className="hidden md:flex md:w-1/2 bg-cover bg-center text-white p-10 flex-col justify-center rounded-l-xl"
+                        className="hidden md:flex md:w-1/2  dark:bg-zinc-700 bg-cover bg-center text-white p-10 flex-col justify-center rounded-l-xl"
                         style={{
                             backgroundImage: `url(${sideImage})`,
                         }}

@@ -26,13 +26,13 @@ const FormInput = ({
 
     return (
         <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1">{label}</label>
+            <label className="block text-sm font-semibold mb-1 dark:text-white">{label}</label>
             <div className="relative">
                 <input
                     type={inputType}
                     placeholder={placeholder}
                     {...register(name)}
-                    className={`w-full border-b py-2 pr-10 focus:outline-none ${
+                    className={`w-full border-b py-2 pr-10 focus:outline-none  dark:text-white ${
                         errors[name] ? 'border-red-500' : 'border-gray-300'
                     }`}
                 />
