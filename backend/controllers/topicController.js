@@ -3,21 +3,26 @@ import Topic from '../models/topicModel.js';
 
 const createTopic = async (req, res) => {
     try {
-        const { subjectId, title, explanation, flashcards, notes, revision } =
-            req.body;
-        const topic = await Topic({
+        console.log('Entered Topic')
+        const { subjectId, title } = req.body;
+
+        const output = req.output;
+        const revision = output.quickRevision;
+        console.log('Output at topicC: ', output)
+        const topic = new Topic({
             subjectId: subjectId,
             title: title,
-            explanation: explanation,
-            flashcards: flashcards,
-            notes: notes,
+            output: output,
             revision: revision,
         });
         const createdTopic = await topic.save();
+        console.log('Created Topic:, ', createTopic)
         const subject = await Subject.findById(subjectId);
+        console.log("subject: ",subject)
         subject.topics.push(createdTopic._id);
+        console.log('saving...')
         await subject.save();
-        res.json({ message: 'Topic Added.' });
+        res.json({ message: 'Topic Added.', topic });
     } catch (err) {
         res.json({ message: 'Server Error Please try again Later' });
     }

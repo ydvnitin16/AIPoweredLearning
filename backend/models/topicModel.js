@@ -12,13 +12,10 @@ const topicSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        explanation: {
-            type: String,
-            default: '',
+        output: {
+            type: Object,
+            default: {},
         },
-        flashcards: [{
-            type: Object
-        }],
         notes: {
             type: String,
             default: '', // markdown or html

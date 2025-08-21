@@ -97,7 +97,7 @@ export default function SubjectPage() {
                           navigate('/topic')
                         }}
                             key={topic._id}
-                            className="bg-white rounded-2xl p-6 shadow hover:shadow-lg transition group relative"
+                            className="bg-white rounded-2xl p-6 shadow hover:shadow-lg transition group relative  cursor-pointer"
                         >
                             <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                                 {topic.done && (
