@@ -7,7 +7,7 @@ const topicSchema = new mongoose.Schema(
             ref: 'Subject',
             required: true,
         },
-        title: {
+        topic: {
             type: String,
             required: true,
             trim: true,

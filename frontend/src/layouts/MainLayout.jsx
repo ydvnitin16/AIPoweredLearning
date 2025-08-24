@@ -14,9 +14,6 @@ const MainLayout = () => {
             clearUserStore();
             navigate('/login');
         }
-        if(!isAuthExpired()){
-            navigate('/dashboard')
-        }
     }, [isAuthExpired, clearUserStore, navigate]);
 
     return (

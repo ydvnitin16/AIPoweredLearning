@@ -2,12 +2,12 @@ import GenAI from '../configs/gemini.js';
 
 const generateTopicExp = async (req, res, next) => {
     console.log('entered genai!');
-    const { title } = req.body;
+    const { topic } = req.body;
     const model = GenAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     console.log('genAi...');
     const result = await model.generateContent(`
         You are an AI that only outputs JSON.
-  Explain the topic: ${title}, 3 flashcards and 4 quizzes in this JSON format only:
+  Explain the topic: ${topic}, 3 flashcards and 4 quizzes in this JSON format only:
 
   {
     "content": [

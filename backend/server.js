@@ -21,6 +21,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/generate', async (req, res) => {
     const { topic } = req.body;
@@ -55,7 +56,7 @@ app.get('/generate', async (req, res) => {
     let jsonOutput;
     try {
         jsonOutput = JSON.parse(cleanOutput);
-        res.json({output, cleanOutput, jsonOutput})
+        res.json({ output, cleanOutput, jsonOutput });
     } catch (err) {
         console.error('Failed to parse JSON:', cleanOutput);
     }

@@ -1,6 +1,7 @@
 import Subject from '../models/subjectModel.js';
 
 const createSubject = async (req, res) => {
+    console.log(req.body)
     const { title } = req.body;
 
     if (!title || title === null || title === null || title.trim() === '') {
