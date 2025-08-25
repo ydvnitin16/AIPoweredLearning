@@ -44,6 +44,7 @@ export default function TopicPage() {
     const contentArr = selectedTopic?.output?.content ?? [];
     const flashcards = selectedTopic?.output?.flashcards ?? [];
     const quizzes = selectedTopic?.output?.quizzes ?? [];
+    const quickRevision = selectedTopic?.output?.quickRevision;
 
     // Persist notes locally for demo (replace with API saving)
     useEffect(() => {
@@ -176,9 +177,24 @@ export default function TopicPage() {
                     )}
 
                     {contentArr.map((obj, idx) => {
-                        return <ContentRenderer obj={obj} idx={idx} />
+                        return <ContentRenderer obj={obj} idx={idx} />;
                     })}
-                    
+
+                    {/* Quick Revision */}
+                    <section
+                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 rounded-xl shadow-md"
+                    >
+                        {contentArr && (
+                            <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                                Quick Revision
+                            </h2>
+                        )}
+                        <div className="prose prose-zinc max-w-none prose-sm sm:prose-base dark:prose-invert">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {quickRevision ?? ''}
+                            </ReactMarkdown>
+                        </div>
+                    </section>
 
                     {/* Flashcards */}
                     <section>

@@ -11,12 +11,16 @@ import { useQuery } from '@tanstack/react-query';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import TopicPromptFormModal from '../components/form/TopicPromptFormModal.jsx';
+import { getColorFromLetter } from '../services/utils.js';
 
 export default function SubjectPage() {
     const [isOpen, setIsOpen] = useState();
     const navigate = useNavigate();
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
     const setSelectedTopic = UseSelectedSubjectTopic((s) => s.setSelectedTopic);
+    const setSelectedSubjects_Topics = UseSelectedSubjectTopic(
+        (s) => s.setSelectedSubjects_Topics
+    );
 
     const [subject] = useState({
         id: 1,
@@ -27,6 +31,7 @@ export default function SubjectPage() {
 
     const { data: topics } = useQuery({
         queryKey: ['topics', selectedSubject?._id],
+        enabled: !!selectedSubject?._id,
         queryFn: () =>
             selectedSubject &&
             fetch(
@@ -41,6 +46,13 @@ export default function SubjectPage() {
                 .then((d) => d.topics),
     });
 
+    useEffect(() => {
+        if (selectedSubject?._id) {
+            // push into Zustand whenever topics change
+            setSelectedSubjects_Topics(selectedSubject._id, topics);
+        }
+    }, [topics, selectedSubject?._id, setSelectedSubjects_Topics]);
+
     return (
         <>
             <TopicPromptFormModal
@@ -50,7 +62,12 @@ export default function SubjectPage() {
             <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors">
                 {/* Subject Header */}
                 <header
-                    className={`relative p-8 md:p-10 text-white rounded-b-3xl shadow-lg bg-gradient-to-r ${subject.color}`}
+                    className={`relative p-8 md:p-10 text-white rounded-b-3xl shadow-lg bg-gradient-to-r `}
+                    style={{
+                        backgroundColor: getColorFromLetter(
+                            selectedSubject?.title
+                        ),
+                    }}
                 >
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                         <div>
@@ -81,7 +98,8 @@ export default function SubjectPage() {
                             >
                                 <Sparkles size={16} /> Add Topic (AI)
                             </button>
-                            <button className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
+                            <button
+                            onClick={() => navigate('/revision')} className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
                                 Revise
                             </button>
                             <button className="px-3 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
