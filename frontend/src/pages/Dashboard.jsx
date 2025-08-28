@@ -46,7 +46,7 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
-        // console.log(mySubjects);
+        console.log(mySubjects);
     }, [mySubjects]);
 
     return (

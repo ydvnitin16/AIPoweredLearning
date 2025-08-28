@@ -12,6 +12,7 @@ import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import TopicPromptFormModal from '../components/form/TopicPromptFormModal.jsx';
 import { getColorFromLetter } from '../services/utils.js';
+import SuggestedTopicCard from '../components/common/SuggestedTopicCard.jsx';
 
 export default function SubjectPage() {
     const [isOpen, setIsOpen] = useState();
@@ -52,6 +53,11 @@ export default function SubjectPage() {
             setSelectedSubjects_Topics(selectedSubject._id, topics);
         }
     }, [topics, selectedSubject?._id, setSelectedSubjects_Topics]);
+
+    useEffect(() => {
+    window.scrollTo(0, 0);
+}, []);
+
 
     return (
         <>
@@ -99,7 +105,9 @@ export default function SubjectPage() {
                                 <Sparkles size={16} /> Add Topic (AI)
                             </button>
                             <button
-                            onClick={() => navigate('/revision')} className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
+                                onClick={() => navigate('/revision')}
+                                className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition"
+                            >
                                 Revise
                             </button>
                             <button className="px-3 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
@@ -162,6 +170,22 @@ export default function SubjectPage() {
                                     </button>
                                 </div>
                             </div>
+                        ))}
+                    </div>
+                    {selectedSubject?.suggestedTopics.length > 0 && <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6">
+                        <span
+                            className="text-md px-4 py-1 
+                             bg-indigo-100 dark:bg-indigo-900/60 
+                             text-indigo-600 dark:text-indigo-400 
+                             rounded-full font-medium mr-3"
+                        >
+                            AI
+                        </span>
+                        Suggested Topics
+                    </h2>}
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
+                        {selectedSubject?.suggestedTopics?.map((topicName) => (
+                            <SuggestedTopicCard topicName={topicName} />
                         ))}
                     </div>
                 </main>

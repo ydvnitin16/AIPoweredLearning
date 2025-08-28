@@ -30,6 +30,10 @@ const subjectSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        suggestedTopics: {
+            type: Array,
+            default: [],
+        },
     },
     {
         timestamps: true,

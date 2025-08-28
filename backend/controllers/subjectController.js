@@ -1,7 +1,7 @@
 import Subject from '../models/subjectModel.js';
 
 const createSubject = async (req, res) => {
-    console.log(req.body)
+    console.log(req.body);
     const { title } = req.body;
 
     if (!title || title === null || title === null || title.trim() === '') {
@@ -11,6 +11,7 @@ const createSubject = async (req, res) => {
         const subject = await Subject({
             title: title.trim(),
             userId: req.user.id,
+            suggestedTopics: req.suggestedTopics,
         });
 
         subject.save();

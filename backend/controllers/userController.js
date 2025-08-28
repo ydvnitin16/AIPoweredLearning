@@ -76,6 +76,9 @@ const loginUser = async (req, res) => {
                 id: userInfo._id,
                 name: userInfo.name,
                 email: userInfo.email,
+                bio: userInfo.bio,
+                preference: userInfo.preference,
+                additionalInfo: userInfo.additionalInfo
             },
         });
     } catch (error) {
