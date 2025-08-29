@@ -6,9 +6,11 @@ import { getColorFromLetter } from '../services/utils.js';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
+import UpdateProfileModal from '../components/form/UpdateProfileModal.jsx';
 
 export default function Dashboard() {
     const [isOpen, setIsOpen] = useState();
+    const [isProfileOpen, setIsProfileOpen] = useState();
     const setSelectedSubject = UseSelectedSubjectTopic(
         (state) => state.setSelectedSubject
     );
@@ -55,6 +57,7 @@ export default function Dashboard() {
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
             />
+            <UpdateProfileModal isProfileOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
             <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors">
                 {/* Top Navigation */}
                 <header
@@ -71,7 +74,9 @@ export default function Dashboard() {
                         <button className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
                             Public Subjects
                         </button>
-                        <button className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                        <button 
+                        onClick={() => {setIsProfileOpen(true)
+                        }} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer">
                             Profile
                         </button>
                     </nav>

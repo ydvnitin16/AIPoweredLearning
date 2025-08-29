@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useFormStore } from '../../stores/UseTopicFormStore.jsx';
 import Button from '../common/Button.jsx';
 import FormInput from '../common/FormInput.jsx';
@@ -9,28 +9,38 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic.jsx';
 
 // ---------------- Schema Validation ----------------
-const schema = z.object({
-    topic: z.string().min(2, 'Topic name must be at least 2 characters'),
-    prompt: z.string().optional(),
-    flashcardsEnabled: z.boolean().default(false),
-    flashcardsCount: z
-        .number({ invalid_type_error: 'Flashcards count must be a number' })
+const schema = yup.object({
+    topic: yup
+        .string()
+        .min(2, 'Topic name must be at least 2 characters')
+        .required('Topic is required'),
+    prompt: yup.string().notRequired(),
+    flashcardsEnabled: yup.boolean().default(false),
+    flashcardsCount: yup
+        .number()
+        .typeError('Flashcards count must be a number')
         .min(1, 'At least 1 flashcard required')
         .max(50, 'Max 50 flashcards')
-        .optional(),
-    quizzesEnabled: z.boolean().default(false),
-    quizzesCount: z
-        .number({ invalid_type_error: 'Quizzes count must be a number' })
+        .notRequired(),
+
+    quizzesEnabled: yup.boolean().default(false),
+    quizzesCount: yup
+        .number()
+        .typeError('Quizzes count must be a number')
         .min(1, 'At least 1 quiz required')
         .max(20, 'Max 20 quizzes')
-        .optional(),
-    practiceEnabled: z.boolean().default(false),
-    practiceDifficulty: z.enum(['easy', 'medium', 'hard']).optional(),
-    practiceCount: z
-        .number({ invalid_type_error: 'Practice count must be a number' })
+        .notRequired(),
+    practiceEnabled: yup.boolean().default(false),
+    practiceDifficulty: yup
+        .mixed()
+        .oneOf(['easy', 'medium', 'hard'])
+        .notRequired(),
+    practiceCount: yup
+        .number()
+        .typeError('Practice count must be a number')
         .min(1, 'At least 1 question required')
         .max(50, 'Max 50 questions')
-        .optional(),
+        .notRequired(),
 });
 
 export default function TopicPromptFormModal({ isOpen, onClose }) {
@@ -44,7 +54,7 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
         watch,
         formState: { errors },
     } = useForm({
-        resolver: zodResolver(schema),
+        resolver: yupResolver(schema),
         defaultValues: {
             topicName: '',
             prompt: '',

@@ -11,11 +11,10 @@ const FormInput = ({
     errors,
     placeholder,
     icon,
+    value
 }) => {
     const [showPassword, setShowPassword] = useState(false);
-
     let inputType = type === 'password' && showPassword ? 'text' : type;
-
     useEffect(() => {
         if (showPassword) {
             type = 'text';
@@ -31,6 +30,7 @@ const FormInput = ({
                 <input
                     type={inputType}
                     placeholder={placeholder}
+                    defaultValue={value}
                     {...register(name)}
                     className={`w-full border-b py-2 pr-10 focus:outline-none  dark:text-white ${
                         errors[name] ? 'border-red-500' : 'border-gray-300'

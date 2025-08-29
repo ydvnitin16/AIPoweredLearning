@@ -8,7 +8,7 @@ const SuggestedTopicCard = ({ setIsOpen, topicName }) => {
             className="group bg-white dark:bg-zinc-900 border
                        border-zinc-200 dark:border-zinc-800 
                        rounded-xl p-5 flex items-center justify-between 
-                       hover:border-indigo-500 hover:shadow transition"
+                       hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow transition"
         >
             <div className="flex items-center gap-3">
                 <div className="p-2 rounded-md bg-indigo-100 dark:bg-indigo-800">

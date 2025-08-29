@@ -18,7 +18,10 @@ const Signup = () => {
 
     // Validation schema
     const schema = yup.object({
-        name: yup.string().trim().required('Name is required'),
+        name: yup
+            .string()
+            .min(2, 'Name must be at least 2 characters')
+            .required('Name is required'),
         email: yup
             .string()
             .trim()
@@ -118,7 +121,7 @@ const Signup = () => {
                                     className="mr-2 cursor-pointer"
                                     required
                                 />
-                                <span className='dark:text-white'>
+                                <span className="dark:text-white">
                                     I accept the{' '}
                                     <Link
                                         to="/login"

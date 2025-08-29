@@ -23,7 +23,6 @@ const generateTopicExp = async (req, res, next) => {
         userProfile: {
             bio: req.user.bio,
             additionalInfo: req.user.additionalInfo,
-            preference: req.user.preference,
         },
     };
 
@@ -96,9 +95,8 @@ Never include reasoning — only the JSON object.
 
 User context:
 - Topic: ${config.topic}
-- Stream: ${config.userProfile.stream}
-- Level: ${config.userProfile.level}
-- Preference: ${config.userProfile.preference}
+- What user do: ${config.userProfile.bio}
+- additional Info: ${config.userProfile.additionalInfo}
 - Extra Instruction: ${config.prompt || 'None'}
 
 Follow this schema strictly:
@@ -108,6 +106,7 @@ Follow this schema strictly:
     { "type": "code", "data": "..." },
     { "type": "formula", "heading": "...", "data": "..." },
     { "type": "image", "heading": "...", "data": "..." }
+     ...
   ],
   "flashcards": [
     { "question": "...", "answer": "..." }

@@ -28,7 +28,6 @@ const userSchema = new mongoose.Schema(
             },
         ],
         bio: { type: String, default: '', trim: true },
-        preference: { type: String, default: 'concise', trim: true },
         additionalInfo: { type: String, default: '', trim: true },
     },
     { timestamps: true }

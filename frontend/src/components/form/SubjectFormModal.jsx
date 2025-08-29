@@ -1,15 +1,15 @@
 // src/components/modals/SubjectFormModal.jsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import Button from '../common/Button.jsx';
 import FormInput from '../common/FormInput.jsx';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 // ---------------- Schema Validation ----------------
-const schema = z.object({
-    title: z.string().min(2, 'Subject title must be at least 2 characters'),
+const schema = yup.object({
+    title: yup.string().min(2, 'Subject title must be at least 2 characters'),
 });
 
 export default function SubjectFormModal({ isOpen, onClose }) {
@@ -19,7 +19,7 @@ export default function SubjectFormModal({ isOpen, onClose }) {
         formState: { errors },
         reset,
     } = useForm({
-        resolver: zodResolver(schema),
+        resolver: yupResolver(schema),
         defaultValues: {
             subjectTitle: '',
         },
