@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ContentRenderer from '../components/topics/contentRenderer.jsx';
+import PracticeQuestionCard from '../components/topics/PracticeQuestionCard.jsx';
 
 export default function TopicPage() {
     const navigate = useNavigate();
@@ -41,10 +42,11 @@ export default function TopicPage() {
     }, []);
 
     // defensive defaults
-    const contentArr = selectedTopic?.output?.content ?? [];
-    const flashcards = selectedTopic?.output?.flashcards ?? [];
-    const quizzes = selectedTopic?.output?.quizzes ?? [];
-    const quickRevision = selectedTopic?.output?.quickRevision;
+    const contentArr = selectedTopic?.output?.content || [];
+    const flashcards = selectedTopic?.output?.flashcards || [];
+    const quizzes = selectedTopic?.output?.quizzes || [];
+    const quickRevision = selectedTopic?.output?.quickRevision || null;
+    const practiceQuestions = selectedTopic?.output?.practiceQuestions || [];
 
     // Persist notes locally for demo (replace with API saving)
     useEffect(() => {
@@ -63,7 +65,7 @@ export default function TopicPage() {
             {/* Header */}
             <header className="backdrop-blur-sm shadow-md sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/70 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
-                    <h1 className="text-lg sm:text-xl font-bold text-indigo-600">
+                    <h1 className="text-xl sm:text-2xl font-bold">
                         📘 Smart Study AI
                     </h1>
 
@@ -150,15 +152,20 @@ export default function TopicPage() {
             </header>
 
             {/* Breadcrumb */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+            <div className="max-w-7xl mx-auto px-4 font-medium sm:px-6 py-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                 <div className="flex flex-wrap gap-1 sm:gap-2 items-center">
-                    <span className="truncate">Dashboard</span>
+                    <span onClick={() => navigate(-2)} className="truncate cursor-pointer">
+                        Dashboard
+                    </span>
                     <span>→</span>
-                    <span className="truncate max-w-[40vw] sm:max-w-none">
+                    <span
+                        onClick={() => navigate(-1)}
+                        className="truncate max-w-[40vw] sm:max-w-none cursor-pointer"
+                    >
                         {selectedSubject?.title ?? 'Subject'}
                     </span>
                     <span>→</span>
-                    <span className="text-indigo-600 truncate max-w-[40vw] sm:max-w-none">
+                    <span className="text-zinc-800 dark:text-zinc-300 truncate max-w-[40vw] sm:max-w-none">
                         {selectedTopic?.topic ?? 'Topic'}
                     </span>
                 </div>
@@ -181,9 +188,7 @@ export default function TopicPage() {
                     })}
 
                     {/* Quick Revision */}
-                    <section
-                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 rounded-xl shadow-md"
-                    >
+                    <section className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 rounded-xl shadow-md">
                         {contentArr && (
                             <h2 className="text-xl sm:text-2xl font-bold mb-2">
                                 Quick Revision
@@ -207,7 +212,7 @@ export default function TopicPage() {
                             {flashcards.map((card, i) => (
                                 <div
                                     key={i}
-                                    className="min-w-[85%] snap-center bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md"
+                                    className="min-w-[85%] snap-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
                                 >
                                     <p className="font-semibold">
                                         Q: {card.question}
@@ -223,7 +228,7 @@ export default function TopicPage() {
                             {flashcards.map((card, i) => (
                                 <div
                                     key={i}
-                                    className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md"
+                                    className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
                                 >
                                     <p className="font-semibold">
                                         Q: {card.question}
@@ -249,6 +254,23 @@ export default function TopicPage() {
                             )}
                             {quizzes.map((q, i) => (
                                 <QuizQuestion key={i} q={q} i={i} />
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="space-y-4">
+                        <h2 className="text-lg sm:text-xl font-semibold mb-3">
+                            Practice Questions
+                        </h2>
+
+                        <div className="grid gap-4">
+                            {practiceQuestions.map((q, idx) => (
+                                <PracticeQuestionCard
+                                    key={idx}
+                                    index={idx + 1}
+                                    question={q.question}
+                                    answer={q.answer}
+                                />
                             ))}
                         </div>
                     </section>

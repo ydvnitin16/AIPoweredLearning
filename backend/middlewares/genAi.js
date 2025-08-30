@@ -6,6 +6,7 @@ const generateTopicExp = async (req, res, next) => {
     const { topic } = req.body;
     const userConfig = {
         topic: req.body.topic,
+        subject: req.body.subject,
         prompt: req.body.prompt,
         flashcards: {
             enabled: req.body.flashcards.enabled,
@@ -47,11 +48,16 @@ const generateTopicExp = async (req, res, next) => {
 };
 
 const getSuggestedTopics = async (req, res, next) => {
-    const { title } = req.body;
+    const { title, topic } = req.body;
     const prompt = `
-      Generate array of 10 topics related to subject ${title}
-      follow this schema strictly:
-      ["topic1", "topic2",...]
+    You are a curriculum assistant.
+        Given a subject or topic, generate 10 highly relevant and logically ordered topics that a learner should study next. 
+        - If the input is a SUBJECT (e.g. "Computer Networks"), return subtopics covering the subject step by step.
+        - If the input is a TOPIC (e.g. "OSI Model"), return related or next-level topics that follow naturally in the learning path.
+        - Format your output strictly as a valid JSON array of strings:
+        ["topic1", "topic2", "topic3", ...]
+  
+    Input: ${title || topic}
   `;
     const model = GenAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     console.log('genAi...');
@@ -95,17 +101,17 @@ Never include reasoning — only the JSON object.
 
 User context:
 - Topic: ${config.topic}
+- Subject: ${config.subject}
 - What user do: ${config.userProfile.bio}
 - additional Info: ${config.userProfile.additionalInfo}
 - Extra Instruction: ${config.prompt || 'None'}
 
-Follow this schema strictly:
+Follow this example schema strictly:
 {
   "content": [
-    { "type": "text", "heading": "...", "data": "..." },
-    { "type": "code", "data": "..." },
-    { "type": "formula", "heading": "...", "data": "..." },
-    { "type": "image", "heading": "...", "data": "..." }
+    { "type": "...", "heading": "...", "data": "..." },
+    { "type": "...", "heading": "...", "data": "..." },
+    { "type": "...", "heading": "...", "data": "..." }
      ...
   ],
   "flashcards": [
@@ -124,6 +130,7 @@ Rules:
 - Explanations: clear, structured, ${
         config.userProfile.preference || 'college-level'
     }.
+- Content: supported types ['text', 'code', 'formula']
 - Code: always include inline comments.
 - ${flashcardRule}
 - ${quizRule}

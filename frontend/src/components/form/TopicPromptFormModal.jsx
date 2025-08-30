@@ -113,9 +113,10 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
                 count: Number(data.practiceCount),
             },
         };
-
+        console.log(selectedSubject)
         const res = await mutation.mutateAsync({
             topic: data.topic,
+            subject: selectedSubject.title,
             prompt: data.prompt,
             flashcards: {
                 enabled: data.flashcardsEnabled,
