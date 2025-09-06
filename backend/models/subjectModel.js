@@ -12,10 +12,6 @@ const subjectSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        progress: {
-            type: Number,
-            default: 0, // e.g., percentage progress (0 to 100)
-        },
         topics: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -27,6 +23,10 @@ const subjectSchema = new mongoose.Schema(
             default: false,
         },
         likes: {
+            type: Number,
+            default: 0,
+        },
+        progress: {
             type: Number,
             default: 0,
         },

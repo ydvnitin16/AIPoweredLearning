@@ -43,7 +43,11 @@ const schema = yup.object({
         .notRequired(),
 });
 
-export default function TopicPromptFormModal({ isOpen, onClose }) {
+export default function TopicPromptFormModal({
+    isOpen,
+    onClose,
+    setIsGenerating,
+}) {
     console.log('Modal Opened');
     const { setFormData } = useFormStore();
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
@@ -71,6 +75,7 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (data) => {
+            setIsGenerating(true);
             const res = await fetch(
                 `${import.meta.env.VITE_SERVER_URL}/topics`,
                 {
@@ -88,6 +93,9 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
             queryClient.invalidateQueries({
                 queryKey: ['topics', selectedSubject?._id],
             });
+            queryClient.invalidateQueries({
+                queryKey: ['subjects'],
+            });
         },
     });
 
@@ -96,6 +104,7 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
     const practiceEnabled = watch('practiceEnabled');
 
     const onSubmit = async (data) => {
+        onClose();
         const formatted = {
             topic: data.topic,
             prompt: data.prompt,
@@ -113,7 +122,7 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
                 count: Number(data.practiceCount),
             },
         };
-        console.log(selectedSubject)
+        console.log(selectedSubject);
         const res = await mutation.mutateAsync({
             topic: data.topic,
             subject: selectedSubject.title,
@@ -135,9 +144,10 @@ export default function TopicPromptFormModal({ isOpen, onClose }) {
         });
         console.log(res);
         const resData = await res.json();
+        setIsGenerating(false);
         console.log(resData);
         setFormData(formatted);
-        onClose(); // close modal after submit
+        // close modal after submit
     };
 
     if (!isOpen) return null; // modal closed

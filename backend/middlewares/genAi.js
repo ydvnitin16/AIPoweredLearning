@@ -51,9 +51,19 @@ const getSuggestedTopics = async (req, res, next) => {
     const { title, topic } = req.body;
     const prompt = `
     You are a curriculum assistant.
-        Given a subject or topic, generate 10 highly relevant and logically ordered topics that a learner should study next. 
-        - If the input is a SUBJECT (e.g. "Computer Networks"), return subtopics covering the subject step by step.
-        - If the input is a TOPIC (e.g. "OSI Model"), return related or next-level topics that follow naturally in the learning path.
+        Given a ${title ? 'subject' : ''} ${
+        topic ? 'topic' : ''
+    }, generate 10 highly relevant and logically ordered topics that a learner should study next. 
+        ${
+            title
+                ? '- Input is a SUBJECT return subtopics covering the subject step by step.'
+                : ''
+        }
+        ${
+            topic
+                ? '- Input is a TOPIC return related or next topics that follow naturally in the learning path.'
+                : ''
+        }
         - Format your output strictly as a valid JSON array of strings:
         ["topic1", "topic2", "topic3", ...]
   

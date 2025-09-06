@@ -7,8 +7,11 @@ import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
 import UpdateProfileModal from '../components/form/UpdateProfileModal.jsx';
+import CardLoading from '../components/common/CardLoading.jsx'
 
 export default function Dashboard() {
+
+    const [isCreating, setIsCreating] = useState()
     const [isOpen, setIsOpen] = useState();
     const [isProfileOpen, setIsProfileOpen] = useState();
     const setSelectedSubject = UseSelectedSubjectTopic(
@@ -16,26 +19,16 @@ export default function Dashboard() {
     );
     const navigate = useNavigate();
 
-    const [publicSubjects, setPublicSubjects] = useState([
-        {
-            id: 4,
-            title: 'Astronomy Basics',
-            color: 'from-sky-400 to-blue-500',
-            creator: 'Alice',
-        },
-        {
-            id: 5,
-            title: 'Modern Economics',
-            color: 'from-amber-400 to-orange-500',
-            creator: 'John',
-        },
-        {
-            id: 6,
-            title: 'Art History',
-            color: 'from-fuchsia-400 to-pink-500',
-            creator: 'Sophia',
-        },
-    ]);
+
+    const { data: publicSubjects } = useQuery({
+        queryKey: ['publicSubjects'],
+        queryFn: () =>
+            fetch(`${import.meta.env.VITE_SERVER_URL}/public-subjects`, {
+                credentials: 'include',
+            })
+                .then((res) => res.json())
+                .then((data) => data.publicSubjects),
+    });
 
     const { data: mySubjects } = useQuery({
         queryKey: ['subjects'],
@@ -54,6 +47,7 @@ export default function Dashboard() {
     return (
         <>
             <SubjectFormModal
+            setIsCreating={setIsCreating}
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
             />
@@ -139,6 +133,7 @@ export default function Dashboard() {
                                     </p>
                                 </div>
                             ))}
+                            {isCreating && <CardLoading msg='Creating Subject' />}
 
                             {/* Empty state (optional) */}
                             {!mySubjects?.length && (
@@ -156,9 +151,13 @@ export default function Dashboard() {
                             <Compass size={20} /> Explore Public Subjects
                         </h2>
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {publicSubjects.map((subj) => (
+                            {publicSubjects && publicSubjects.map((subj) => (
                                 <div
-                                    key={subj.id}
+                                onClick={() => {
+                                        setSelectedSubject(subj);
+                                        navigate('/subject');
+                                    }}
+                                    key={subj._id}
                                     className={`rounded-3xl p-6 shadow-lg bg-gradient-to-br ${subj.color} text-white
                             hover:scale-[1.02] hover:shadow-2xl transition cursor-pointer
                             ring-1 ring-white/10 hover:ring-white/20`}
@@ -167,7 +166,7 @@ export default function Dashboard() {
                                         {subj.title}
                                     </h3>
                                     <p className="text-sm mt-2 opacity-95 flex items-center gap-1">
-                                        <Users size={14} /> by {subj.creator}
+                                        <Users size={14} /> by {subj.userId?.name}
                                     </p>
                                 </div>
                             ))}

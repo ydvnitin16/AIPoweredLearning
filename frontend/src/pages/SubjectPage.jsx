@@ -6,6 +6,8 @@ import {
     Pencil,
     Trash2,
     Sparkles,
+    Lock,
+    Earth,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
@@ -13,8 +15,10 @@ import { useNavigate } from 'react-router-dom';
 import TopicPromptFormModal from '../components/form/TopicPromptFormModal.jsx';
 import { getColorFromLetter } from '../services/utils.js';
 import SuggestedTopicCard from '../components/common/SuggestedTopicCard.jsx';
+import CardLoading from '../components/common/CardLoading.jsx';
 
 export default function SubjectPage() {
+    const [isGenerating, setIsGenerating] = useState();
     const [isOpen, setIsOpen] = useState();
     const navigate = useNavigate();
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
@@ -30,7 +34,11 @@ export default function SubjectPage() {
         progress: 60,
     });
 
-    const { data: topics } = useQuery({
+    const {
+        data: topics,
+        isLoading,
+        error,
+    } = useQuery({
         queryKey: ['topics', selectedSubject?._id],
         enabled: !!selectedSubject?._id,
         queryFn: () =>
@@ -55,13 +63,38 @@ export default function SubjectPage() {
     }, [topics, selectedSubject?._id, setSelectedSubjects_Topics]);
 
     useEffect(() => {
-    window.scrollTo(0, 0);
-}, []);
+        window.scrollTo(0, 0);
+    }, []);
 
+    const [isPublic, setIsPublic] = useState();
+
+    async function handlePublicToggle(e) {
+        setIsPublic(e.target.checked);
+        const formatted = {
+            isPublic: e.target.checked,
+            subjectId: selectedSubject?._id,
+        };
+        console.log(formatted);
+        const res = await fetch(
+            `${import.meta.env.VITE_SERVER_URL}/subjects/public`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formatted),
+            }
+        );
+        console.log(res);
+        const data = await res.json();
+        console.log(data);
+    }
 
     return (
         <>
             <TopicPromptFormModal
+                setIsGenerating={setIsGenerating}
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
             />
@@ -110,9 +143,18 @@ export default function SubjectPage() {
                             >
                                 Revise
                             </button>
-                            <button className="px-3 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition">
-                                <Settings size={16} />
-                            </button>
+                            <label class="inline-flex items-center cursor-pointer ">
+                                <input
+                                    type="checkbox"
+                                    checked={isPublic}
+                                    defaultChecked={selectedSubject?.isPublic}
+                                    onChange={(e) => handlePublicToggle(e)}
+                                    className="sr-only peer"
+                                />
+                                <Lock size={17} />
+                                <div className="mx-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+                                <Earth size={17} />
+                            </label>
                         </div>
                     </div>
                 </header>
@@ -171,18 +213,23 @@ export default function SubjectPage() {
                                 </div>
                             </div>
                         ))}
+                        {isGenerating && (
+                            <CardLoading msg="Generating Topic..." />
+                        )}
                     </div>
-                    {selectedSubject?.suggestedTopics.length > 0 && <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6">
-                        <span
-                            className="text-md px-4 py-1 
+                    {selectedSubject?.suggestedTopics.length > 0 && (
+                        <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6">
+                            <span
+                                className="text-md px-4 py-1 
                              bg-indigo-100 dark:bg-indigo-900/60 
                              text-indigo-600 dark:text-indigo-400 
                              rounded-full font-medium mr-3"
-                        >
-                            AI
-                        </span>
-                        Suggested Topics
-                    </h2>}
+                            >
+                                AI
+                            </span>
+                            Suggested Topics
+                        </h2>
+                    )}
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
                         {selectedSubject?.suggestedTopics?.map((topicName) => (
                             <SuggestedTopicCard topicName={topicName} />

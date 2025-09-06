@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const topicSchema = new mongoose.Schema(
     {
@@ -23,6 +23,10 @@ const topicSchema = new mongoose.Schema(
         revision: {
             type: String,
             trim: true,
+        },
+        isDone: {
+            type: Boolean,
+            default: false,
         },
     },
     {

@@ -1,14 +1,15 @@
 import Subject from '../models/subjectModel.js';
 import Topic from '../models/topicModel.js';
+import User from '../models/userModel.js';
 
 const createTopic = async (req, res) => {
     try {
-        console.log('Entered Topic')
+        console.log('Entered Topic');
         const { subjectId, topic } = req.body;
 
         const output = req.output;
         const revision = output.quickRevision;
-        console.log('Output at topicC: ', output)
+        console.log('Output at topicC: ', output);
         const newTopic = new Topic({
             subjectId: subjectId,
             topic: topic,
@@ -16,11 +17,12 @@ const createTopic = async (req, res) => {
             revision: revision,
         });
         const createdTopic = await newTopic.save();
-        console.log('Created Topic:, ', createTopic)
+        console.log('Created Topic:, ', createTopic);
         const subject = await Subject.findById(subjectId);
-        console.log("subject: ",subject)
         subject.topics.push(createdTopic._id);
-        console.log('saving...')
+        subject.suggestedTopics = req.suggestedTopics;
+        console.log('subject: ', subject);
+        console.log('saving...');
         await subject.save();
         res.json({ message: 'Topic Added.', newTopic });
     } catch (err) {
@@ -38,4 +40,31 @@ const getTopicsOfSubject = async (req, res) => {
     }
 };
 
-export { createTopic, getTopicsOfSubject };
+const markAsDone = async (req, res) => {
+    const { isDone, topicId } = req.body;
+    try {
+        const topic = await Topic.findById(topicId);
+        if (!topic) {
+            return res.json({ message: 'Topic Not Found' });
+        }
+
+        const user = await User.findById(req.user.id);
+        const youAllowed = user.subjects.some(
+            (subj) => subj.toString() === topic.subjectId.toString()
+        );
+
+        if(!youAllowed) return res.json({ message: 'You are not allowed' });
+
+        topic.isDone = isDone;
+        await topic.save();
+        res.json({
+            message: `Topic marked ${isDone ? 'completed' : 'in progress'}`,
+        });
+    } catch (err) {
+        return res
+            .status(500)
+            .json({ message: 'Server error. Please try again later.' });
+    }
+};
+
+export { createTopic, getTopicsOfSubject, markAsDone };

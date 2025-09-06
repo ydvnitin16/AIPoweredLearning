@@ -15,7 +15,7 @@ export default function TopicPage() {
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
 
     const [notes, setNotes] = useState('');
-    const [done, setDone] = useState(false);
+    const [isDone, setIsDone] = useState(selectedTopic?.isDone);
     const [darkMode, setDarkMode] = useState(
         localStorage.getItem('theme') === 'dark'
     );
@@ -60,13 +60,38 @@ export default function TopicPage() {
         localStorage.setItem(key, notes);
     };
 
+    async function handleMarkDone(e) {
+        setIsDone(e.target.checked);
+        const formatted = {
+            isDone: e.target.checked,
+            topicId: selectedTopic?._id,
+        };
+        console.log(formatted);
+        try{const res = await fetch(
+            `${import.meta.env.VITE_SERVER_URL}/topics/done`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formatted),
+            }
+        );
+        console.log(res);
+        const data = await res.json();
+        console.log(data);
+    }catch(err){
+        console.log(err.message)
+    }
+    }
     return (
         <div className="min-h-screen bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
             {/* Header */}
             <header className="backdrop-blur-sm shadow-md sticky top-0 z-50 bg-white/80 dark:bg-zinc-950/70 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3">
                     <h1 className="text-xl sm:text-2xl font-bold">
-                        📘 Smart Study AI
+                        Smart Study AI
                     </h1>
 
                     {/* Desktop nav */}
@@ -154,7 +179,10 @@ export default function TopicPage() {
             {/* Breadcrumb */}
             <div className="max-w-7xl mx-auto px-4 font-medium sm:px-6 py-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
                 <div className="flex flex-wrap gap-1 sm:gap-2 items-center">
-                    <span onClick={() => navigate(-2)} className="truncate cursor-pointer">
+                    <span
+                        onClick={() => navigate(-2)}
+                        className="truncate cursor-pointer"
+                    >
                         Dashboard
                     </span>
                     <span>→</span>
@@ -184,7 +212,7 @@ export default function TopicPage() {
                     )}
 
                     {contentArr.map((obj, idx) => {
-                        return <ContentRenderer obj={obj} idx={idx} />;
+                        return <ContentRenderer key={idx} obj={obj} idx={idx} />;
                     })}
 
                     {/* Quick Revision */}
@@ -202,112 +230,106 @@ export default function TopicPage() {
                     </section>
 
                     {/* Flashcards */}
-                    <section>
-                        <h3 className="text-lg sm:text-xl font-semibold mb-3">
-                            📑 Flashcards
-                        </h3>
+                    {flashcards.length > 0 && (
+                        <section>
+                            <h3 className="text-lg sm:text-xl font-semibold mb-3">
+                                📑 Flashcards
+                            </h3>
 
-                        {/* Mobile: horizontal snap; >=sm: grid */}
-                        <div className="sm:hidden -mx-4 px-4 overflow-x-auto snap-x snap-mandatory flex gap-3 pb-2">
-                            {flashcards.map((card, i) => (
-                                <div
-                                    key={i}
-                                    className="min-w-[85%] snap-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
-                                >
-                                    <p className="font-semibold">
-                                        Q: {card.question}
-                                    </p>
-                                    <p className="mt-2 text-indigo-600">
-                                        A: {card.answer}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
+                            {/* Mobile: horizontal snap; >=sm: grid */}
+                            <div className="sm:hidden -mx-4 px-4 overflow-x-auto snap-x snap-mandatory flex gap-3 pb-2">
+                                {flashcards.map((card, i) => (
+                                    <div
+                                        key={i}
+                                        className="min-w-[85%] snap-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
+                                    >
+                                        <p className="font-semibold">
+                                            Q: {card.question}
+                                        </p>
+                                        <p className="mt-2 dark:text-indigo-500 text-indigo-600">
+                                            A: {card.answer}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
 
-                        <div className="hidden sm:grid sm:grid-cols-2 gap-4">
-                            {flashcards.map((card, i) => (
-                                <div
-                                    key={i}
-                                    className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
-                                >
-                                    <p className="font-semibold">
-                                        Q: {card.question}
-                                    </p>
-                                    <p className="mt-2 text-indigo-600">
-                                        A: {card.answer}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                            <div className="hidden sm:grid sm:grid-cols-2 gap-4">
+                                {flashcards.map((card, i) => (
+                                    <div
+                                        key={i}
+                                        className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5"
+                                    >
+                                        <p className="font-semibold">
+                                            Q: {card.question}
+                                        </p>
+                                        <p className="mt-2 dark:text-indigo-500 text-indigo-600">
+                                            A: {card.answer}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     {/* Quiz */}
-                    <section>
-                        <h3 className="text-lg sm:text-xl font-semibold mb-3">
-                            📝 Quiz
-                        </h3>
-                        <div className="space-y-3 sm:space-y-4">
-                            {quizzes.length === 0 && (
-                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                    No quiz available.
-                                </p>
-                            )}
-                            {quizzes.map((q, i) => (
-                                <QuizQuestion key={i} q={q} i={i} />
-                            ))}
-                        </div>
-                    </section>
+                    {quizzes.length > 0 && (
+                        <section>
+                            <h3 className="text-lg sm:text-xl font-semibold mb-3">
+                                📝 Quiz
+                            </h3>
+                            <div className="space-y-3 sm:space-y-4">
+                                {quizzes.length === 0 && (
+                                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                        No quiz available.
+                                    </p>
+                                )}
+                                {quizzes.map((q, i) => (
+                                    <QuizQuestion key={i} q={q} i={i} />
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
-                    <section className="space-y-4">
-                        <h2 className="text-lg sm:text-xl font-semibold mb-3">
-                            Practice Questions
-                        </h2>
+                    {practiceQuestions.length > 0 && (
+                        <section className="space-y-4">
+                            <h2 className="text-lg sm:text-xl font-semibold mb-3">
+                                Practice Questions
+                            </h2>
 
-                        <div className="grid gap-4">
-                            {practiceQuestions.map((q, idx) => (
-                                <PracticeQuestionCard
-                                    key={idx}
-                                    index={idx + 1}
-                                    question={q.question}
-                                    answer={q.answer}
-                                />
-                            ))}
-                        </div>
-                    </section>
+                            <div className="grid gap-4">
+                                {practiceQuestions.map((q, idx) => (
+                                    <PracticeQuestionCard
+                                        key={idx}
+                                        index={idx + 1}
+                                        question={q.question}
+                                        answer={q.answer}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </div>
 
                 {/* Right sidebar */}
                 <aside className="space-y-4 sm:space-y-6">
-                    {/* Progress */}
-                    <div className="bg-white dark:bg-zinc-800 p-4 sm:p-6 rounded-xl shadow-md">
-                        <h3 className="font-semibold mb-2">📊 Progress</h3>
-                        <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-3 rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-indigo-500"
-                                style={{
-                                    width: `${selectedTopic?.progress ?? 60}%`,
-                                }}
-                            />
-                        </div>
-                        <p className="text-sm mt-2">
-                            {selectedTopic?.progress ?? 60}% completed
-                        </p>
-                    </div>
-
                     {/* Mark as done */}
-                    <div className="bg-white dark:bg-zinc-800 p-4 sm:p-6 rounded-xl shadow-md">
-                        <h3 className="font-semibold mb-2">✅ Mark as Done</h3>
-                        <button
-                            onClick={() => setDone((v) => !v)}
-                            className={`px-4 py-2 rounded-lg w-full ${
-                                done
-                                    ? 'bg-green-500 text-white'
-                                    : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white'
+                    <label className="inline-flex w-full items-center cursor-pointer ">
+                        <input
+                            type="checkbox"
+                            defaultChecked={selectedTopic?.isDone}
+                            onChange={(e) => {handleMarkDone(e); console.log(selectedTopic)}}
+                            className="sr-only peer"
+                        />
+                        <div
+                            className={`text-center px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
+                                isDone
+                                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                                    : 'bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 hover:bg-zinc-300 text-zinc-900 dark:text-white'
                             }`}
                         >
-                            {done ? 'Done ✔' : 'Mark this topic as Done'}
-                        </button>
-                    </div>
+                            {isDone ? 'Done' : 'Mark As Done'}
+                        </div>
+                    </label>
 
                     {/* Self notes */}
                     <div className="bg-white dark:bg-zinc-800 p-4 sm:p-6 rounded-xl shadow-md">

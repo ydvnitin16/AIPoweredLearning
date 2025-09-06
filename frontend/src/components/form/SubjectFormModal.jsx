@@ -12,7 +12,7 @@ const schema = yup.object({
     title: yup.string().min(2, 'Subject title must be at least 2 characters'),
 });
 
-export default function SubjectFormModal({ isOpen, onClose }) {
+export default function SubjectFormModal({ isOpen, onClose, setIsCreating }) {
     const {
         register,
         handleSubmit,
@@ -27,6 +27,7 @@ export default function SubjectFormModal({ isOpen, onClose }) {
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: async (data) => {
+            setIsCreating(true)
             const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/subjects`, {
                 method: 'POST',
                 credentials: 'include',
@@ -39,10 +40,12 @@ export default function SubjectFormModal({ isOpen, onClose }) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['subjects'] });
+            setIsCreating(false)
         },
     });
 
     const onSubmit = async (data) => {
+        onClose(); // close modal
         const res = await mutation.mutateAsync({ title: data.title });
         if(!res.ok){
             return console.log('Subject Not Added.')
@@ -50,7 +53,6 @@ export default function SubjectFormModal({ isOpen, onClose }) {
         const resData = await res.json();
         console.log(resData.message);
         reset(); // clear form
-        onClose(); // close modal
     };
 
     if (!isOpen) return null;

@@ -19,12 +19,12 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true,
-            minlength: 6, // hide password when fetching user by default
+            minlength: 6,
         },
         subjects: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Subject', // This tells Mongoose to populate from the Subject model
+                ref: 'Subject', // My subject
             },
         ],
         bio: { type: String, default: '', trim: true },
