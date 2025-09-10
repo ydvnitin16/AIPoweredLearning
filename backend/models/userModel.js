@@ -21,14 +21,20 @@ const userSchema = new mongoose.Schema(
             required: true,
             minlength: 6,
         },
+        bio: { type: String, default: '', trim: true },
+        additionalInfo: { type: String, default: '', trim: true },
         subjects: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Subject', // My subject
             },
         ],
-        bio: { type: String, default: '', trim: true },
-        additionalInfo: { type: String, default: '', trim: true },
+        importedSubjects: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Subject',
+            },
+        ],
     },
     { timestamps: true }
 );

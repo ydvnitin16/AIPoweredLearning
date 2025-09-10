@@ -16,17 +16,13 @@ const topicSchema = new mongoose.Schema(
             type: Object,
             default: {},
         },
-        notes: {
-            type: String,
-            default: '', // markdown or html
-        },
         revision: {
             type: String,
             trim: true,
         },
-        isDone: {
-            type: Boolean,
-            default: false,
+        notes: {
+            type: String,
+            default: '',
         },
     },
     {

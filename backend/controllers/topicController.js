@@ -1,15 +1,23 @@
+import mongoose from 'mongoose';
 import Subject from '../models/subjectModel.js';
 import Topic from '../models/topicModel.js';
 import User from '../models/userModel.js';
 
 const createTopic = async (req, res) => {
+    const { subjectId, topic } = req.body;
+    const output = req.output;
+    const revision = output.revision;
     try {
-        console.log('Entered Topic');
-        const { subjectId, topic } = req.body;
+        const subject = await Subject.findById(subjectId);
+        if (!subject)
+            return res.status(404).json({ message: 'Subject not found.' });
 
-        const output = req.output;
-        const revision = output.quickRevision;
-        console.log('Output at topicC: ', output);
+        if (subject.createdBy.valueOf() !== req.user.id)
+            return res.status(403).json({
+                message:
+                    "You are not allowed to create topic in other's Subject",
+            });
+
         const newTopic = new Topic({
             subjectId: subjectId,
             topic: topic,
@@ -17,54 +25,70 @@ const createTopic = async (req, res) => {
             revision: revision,
         });
         const createdTopic = await newTopic.save();
-        console.log('Created Topic:, ', createTopic);
-        const subject = await Subject.findById(subjectId);
-        subject.topics.push(createdTopic._id);
-        subject.suggestedTopics = req.suggestedTopics;
-        console.log('subject: ', subject);
-        console.log('saving...');
+
         await subject.save();
-        res.json({ message: 'Topic Added.', newTopic });
+
+        res.status(201).json({
+            message: 'Topic created successfully.',
+            topic: createdTopic,
+        });
     } catch (err) {
-        res.json({ message: 'Server Error Please try again Later' });
+        console.error(err);
+        res.status(500).json({
+            message: 'Server error. Please try again later.',
+        });
     }
 };
 
 const getTopicsOfSubject = async (req, res) => {
     const { id } = req.params;
-    try {
-        const topics = await Topic.find({ subjectId: id });
-        res.json({ message: 'Topics', topics });
-    } catch (error) {
-        res.json({ message: 'Server Error Please try again Later' });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid subject ID.' });
     }
-};
-
-const markAsDone = async (req, res) => {
-    const { isDone, topicId } = req.body;
     try {
-        const topic = await Topic.findById(topicId);
-        if (!topic) {
-            return res.json({ message: 'Topic Not Found' });
+        const subject = await Subject.findById(id);
+        if (!subject) {
+            return res.status(404).json({ message: 'Subject not found' });
         }
 
-        const user = await User.findById(req.user.id);
-        const youAllowed = user.subjects.some(
-            (subj) => subj.toString() === topic.subjectId.toString()
-        );
-
-        if(!youAllowed) return res.json({ message: 'You are not allowed' });
-
-        topic.isDone = isDone;
-        await topic.save();
-        res.json({
-            message: `Topic marked ${isDone ? 'completed' : 'in progress'}`,
+        const topics = await Topic.find({ subjectId: id });
+        res.status(200).json({
+            message: 'Topics fetched successfully',
+            topics: topics || [],
         });
     } catch (err) {
-        return res
-            .status(500)
-            .json({ message: 'Server error. Please try again later.' });
+        console.error(err);
+        res.status(500).json({
+            message: 'Server error. Please try again later.',
+        });
     }
 };
 
-export { createTopic, getTopicsOfSubject, markAsDone };
+const deleteTopic = async (req, res) => {
+    const { id } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'Invalid subject ID.' });
+    }
+    try {
+        const topic = await Topic.findById(id);
+        if (!topic)
+            return res.status(404).json({ message: 'Topic not found.' });
+
+        const subject = await Subject.findById(topic.subjectId);
+        if (subject.createdBy.valueOf() !== req.user.id)
+            return res.status(403).json({
+                message:
+                    "You are not allowed to delete topic in other's Subject",
+            });
+
+        await Topic.deleteOne({ _id: id });
+        res.status(200).json({ message: 'Topic deleted successfully.' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: 'Server error. Please try again later.',
+        });
+    }
+};
+
+export { createTopic, getTopicsOfSubject, deleteTopic };
