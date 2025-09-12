@@ -1,10 +1,11 @@
 import { Sparkles } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
-const SuggestedTopicCard = ({ setIsOpen, topicName }) => {
+const SuggestedTopicCard = ({ topicName, onGenerate }) => {
+    const [isGenerating, setisGenerating] = useState(false)
+
     return (
         <div
-            onClick={() => setIsOpen(true)}
             className="group bg-white dark:bg-zinc-900 border
                        border-zinc-200 dark:border-zinc-800 
                        rounded-xl p-5 flex items-center justify-between 
@@ -23,14 +24,16 @@ const SuggestedTopicCard = ({ setIsOpen, topicName }) => {
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    setIsOpen(true);
+                    onGenerate(topicName);
+                    setisGenerating(true)
                 }}
-                className="px-3 py-1.5 text-md font-medium 
+                className={`px-3 py-1.5 text-md font-medium 
                            bg-indigo-600 text-white rounded-lg 
                            hover:bg-indigo-700 dark:bg-indigo-500 
-                           dark:hover:bg-indigo-600 transition cursor-pointer"
+                           dark:hover:bg-indigo-600 transition cursor-pointer`}
+                           disabled={isGenerating}
             >
-                Generate
+                {isGenerating ? "Generating..." : "Generate"}
             </button>
         </div>
     );

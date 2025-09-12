@@ -1,33 +1,21 @@
-import toast from 'react-hot-toast';
-import { useSubjectForm } from '../../hooks/UseSubjectForm.jsx';
-import Button from '../common/Button.jsx';
-import FormInput from '../common/FormInput.jsx';
-import { useEffect } from 'react';
+import Button from '../common/Button';
+import { useImportSubjects } from '../../hooks/UseImportSubject';
+import { useState } from 'react';
 
-export default function SubjectFormModal({
-    isOpen,
-    onClose,
-    setSubjectCreatingQueue,
-}) {
-    const { form, mutation } = useSubjectForm();
+const ImportSubject = ({ isOpen, onClose, setSubjectImportingQueue }) => {
+    const { mutation } = useImportSubjects();
+    const [id, setId] = useState('');
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = form;
-
-    const onSubmit = async (data) => {
+    const handleSubmit = async (e) => {
+        e.preventDefault()
         try {
+            setSubjectImportingQueue((prev) => prev + 1);
             onClose();
-            setSubjectCreatingQueue((prev) => prev + 1);
-            await mutation.mutateAsync({ title: data.title });
-            reset();
+            await mutation.mutateAsync({ id });
         } catch (err) {
             console.log(err);
         } finally {
-            setSubjectCreatingQueue((prev) => prev - 1);
+            setSubjectImportingQueue((prev) => prev - 1);
         }
     };
 
@@ -51,24 +39,22 @@ export default function SubjectFormModal({
                 </button>
 
                 <h2 className="text-2xl font-bold mb-4 dark:text-white">
-                    Add New Subject
+                    Import Subject
                 </h2>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Subject Title */}
-                    <FormInput
-                        label="Subject Title"
+                    <input
                         type="text"
-                        name="title"
-                        placeholder="Enter subject title..."
-                        register={register}
-                        errors={errors}
+                        onChange={(e) => setId(e.target.value)}
+                        placeholder="Enter Document _id"
+                        className={`w-full border-b py-2 pr-10 focus:outline-none  dark:text-white border-gray-300`}
                     />
 
                     {/* Submit */}
                     <Button
                         type="submit"
-                        name="Add Subject"
+                        name="Import Subject"
                         bgColor="#16a34a"
                         color="white"
                         borderRadius="8px"
@@ -78,4 +64,6 @@ export default function SubjectFormModal({
             </div>
         </div>
     );
-}
+};
+
+export default ImportSubject;

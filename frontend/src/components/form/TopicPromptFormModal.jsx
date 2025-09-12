@@ -1,54 +1,16 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useFormStore } from '../../stores/UseTopicFormStore.jsx';
 import Button from '../common/Button.jsx';
 import FormInput from '../common/FormInput.jsx';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic.jsx';
-
-// ---------------- Schema Validation ----------------
-const schema = yup.object({
-    topic: yup
-        .string()
-        .min(2, 'Topic name must be at least 2 characters')
-        .required('Topic is required'),
-    prompt: yup.string().notRequired(),
-    flashcardsEnabled: yup.boolean().default(false),
-    flashcardsCount: yup
-        .number()
-        .typeError('Flashcards count must be a number')
-        .min(1, 'At least 1 flashcard required')
-        .max(50, 'Max 50 flashcards')
-        .notRequired(),
-
-    quizzesEnabled: yup.boolean().default(false),
-    quizzesCount: yup
-        .number()
-        .typeError('Quizzes count must be a number')
-        .min(1, 'At least 1 quiz required')
-        .max(20, 'Max 20 quizzes')
-        .notRequired(),
-    practiceEnabled: yup.boolean().default(false),
-    practiceDifficulty: yup
-        .mixed()
-        .oneOf(['easy', 'medium', 'hard'])
-        .notRequired(),
-    practiceCount: yup
-        .number()
-        .typeError('Practice count must be a number')
-        .min(1, 'At least 1 question required')
-        .max(50, 'Max 50 questions')
-        .notRequired(),
-});
+import { useTopicForm } from '../../hooks/UseTopicForm.jsx';
 
 export default function TopicPromptFormModal({
     isOpen,
     onClose,
-    setIsGenerating,
+    setTopicGeneratingQueue,
 }) {
-    console.log('Modal Opened');
+    const { form, mutation } = useTopicForm();
+
     const { setFormData } = useFormStore();
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
 
@@ -57,56 +19,14 @@ export default function TopicPromptFormModal({
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            topicName: '',
-            prompt: '',
-            flashcardsEnabled: false,
-            flashcardsCount: 3,
-            quizzesEnabled: false,
-            quizzesCount: 5,
-            practiceEnabled: false,
-            practiceDifficulty: 'medium',
-            practiceCount: 5,
-        },
-    });
-
-    const queryClient = useQueryClient();
-    const mutation = useMutation({
-        mutationFn: async (data) => {
-            setIsGenerating(true);
-            const res = await fetch(
-                `${import.meta.env.VITE_SERVER_URL}/topics`,
-                {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                }
-            );
-            return res;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['topics', selectedSubject?._id],
-            });
-            queryClient.invalidateQueries({
-                queryKey: ['subjects'],
-            });
-        },
-    });
+    } = form;
 
     const flashcardsEnabled = watch('flashcardsEnabled');
     const quizzesEnabled = watch('quizzesEnabled');
     const practiceEnabled = watch('practiceEnabled');
 
     const onSubmit = async (data) => {
-        onClose();
         const formatted = {
-            topic: data.topic,
             prompt: data.prompt,
             flashcards: {
                 enabled: data.flashcardsEnabled,
@@ -122,39 +42,24 @@ export default function TopicPromptFormModal({
                 count: Number(data.practiceCount),
             },
         };
-        console.log(selectedSubject);
-        const res = await mutation.mutateAsync({
-            topic: data.topic,
-            subject: selectedSubject.title,
-            prompt: data.prompt,
-            flashcards: {
-                enabled: data.flashcardsEnabled,
-                count: Number(data.flashcardsCount),
-            },
-            quizzes: {
-                enabled: data.quizzesEnabled,
-                count: Number(data.quizzesCount),
-            },
-            practiceQuestions: {
-                enabled: data.practiceEnabled,
-                difficulty: data.practiceDifficulty,
-                count: Number(data.practiceCount),
-            },
-            subjectId: selectedSubject?._id,
-        });
-        console.log(res);
-        const resData = await res.json();
-        setIsGenerating(false);
-        console.log(resData);
-        setFormData(formatted);
-        // close modal after submit
+        try {
+            onClose();
+            setTopicGeneratingQueue((prev) => prev + 1);
+            await mutation.mutateAsync({...formatted, topic: data.topic, subject: selectedSubject?.title, subjectId: selectedSubject?._id});
+            setFormData(formatted);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setTopicGeneratingQueue((prev) => prev - 1);
+            
+        }
     };
 
-    if (!isOpen) return null; // modal closed
+    if (!isOpen) return null;
 
     return (
         <div
-            onClick={() => onclose()}
+            onClick={onclose}
             className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50"
         >
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-lg w-full max-w-lg relative">
@@ -298,6 +203,9 @@ export default function TopicPromptFormModal({
                         borderRadius="8px"
                         height="45px"
                     />
+                    <p className="mx-auto max-w-5xl px-4 pb-8 opacity-80 text-xs text-zinc-500 flex items-center gap-2">
+                 This setting will be applied to your next topic generations.
+            </p>
                 </form>
             </div>
         </div>

@@ -1,13 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { UseAuthStore } from '../stores/UseAuthStore';
 import toast from 'react-hot-toast';
+import Navbar from '../components/common/Navbar';
+import SubjectFormModal from '../components/form/SubjectFormModal';
+import UpdateProfileModal from '../components/form/UpdateProfileModal';
+import ConfirmModal from '../components/common/ConfirmModal';
+import { logoutUser } from '../services/apis';
 
 const MainLayout = () => {
     const isAuthExpired = UseAuthStore((state) => state.isAuthExpired);
     const clearUserStore = UseAuthStore((state) => state.clearUserStore);
+    const userStore = UseAuthStore((state) => state.userStore);
     const navigate = useNavigate();
-
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState();
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState();
     useEffect(() => {
         if (isAuthExpired()) {
             toast('Please Login!');
@@ -16,9 +23,38 @@ const MainLayout = () => {
         }
     }, [isAuthExpired, clearUserStore, navigate]);
 
+    const handleLogout = async () => {
+        try {
+            const data = await logoutUser();
+            clearUserStore();
+            toast.success(data.message);
+            navigate('/login')
+        } catch (err) {
+            toast.error('Failed to logout Sorry!');
+        }
+    };
+
     return (
         <>
-            <Outlet />
+            <div className="dark:bg-black">
+                <UpdateProfileModal
+                    isOpen={isProfileModalOpen}
+                    onClose={() => setIsProfileModalOpen(false)}
+                />
+                <ConfirmModal
+                    isOpen={isLogoutModalOpen}
+                    onClose={() => setIsLogoutModalOpen(false)}
+                    onConfirm={handleLogout}
+                    title={'Confirm Logout'}
+                    description={'Do you really want to logout?'}
+                />
+                <Navbar
+                    user={userStore}
+                    setIsProfileModalOpen={setIsProfileModalOpen}
+                    setIsLogoutModalOpen={setIsLogoutModalOpen}
+                />
+                <Outlet />
+            </div>
         </>
     );
 };

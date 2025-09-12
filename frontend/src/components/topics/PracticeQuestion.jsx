@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-const PracticeQuestionCard = ({ index, question, answer }) => {
+const PracticeQuestion = ({ index, question, answer }) => {
     const [showAnswer, setShowAnswer] = useState(false);
 
     return (
@@ -28,5 +28,5 @@ const PracticeQuestionCard = ({ index, question, answer }) => {
         </div>
     );
 };
- 
-export default PracticeQuestionCard;
+
+export default PracticeQuestion;

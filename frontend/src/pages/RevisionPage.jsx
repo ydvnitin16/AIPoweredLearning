@@ -2,17 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Search, BookOpen, Printer, Sparkles } from 'lucide-react';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic';
 
-export default function RevisionPage({ isOpen, onClose }) {
+export default function RevisionPage() {
     const selectedSubjects_Topics = UseSelectedSubjectTopic(
         (s) => s.selectedSubjects_Topics
     );
     const selectedSubject = UseSelectedSubjectTopic(
         (s) => s.selectedSubject
     );
-
-    useEffect(() => {
-        console.log(selectedSubjects_Topics[selectedSubject?._id]);
-    }, [selectedSubjects_Topics]);
 
     const [query, setQuery] = useState('');
 
@@ -28,7 +24,6 @@ export default function RevisionPage({ isOpen, onClose }) {
 
     const handlePrint = () => window.print();
 
-    // if (!isOpen) return null;
 
     return (
         <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">

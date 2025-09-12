@@ -1,60 +1,19 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 import Button from '../common/Button.jsx';
 import FormInput from '../common/FormInput.jsx';
 import { UseAuthStore } from '../../stores/UseAuthStore.jsx';
-import { toast } from 'react-hot-toast';
+import { useUpdateProfile } from '../../hooks/UseUpdateProfile.jsx';
 
-const UpdateProfileModal = ({ isProfileOpen, onClose }) => {
+const UpdateProfileModal = ({ isOpen, onClose }) => {
     const userStore = UseAuthStore((s) => s.userStore);
-    const setUserStore = UseAuthStore((s) => s.setUserStore);
 
-    const userProfileSchema = yup.object({
-        name: yup
-            .string()
-            .min(2, 'Name must be at least 2 characters')
-            .required('Name is required'),
-
-        bio: yup
-            .string()
-            .max(200, 'Bio must be at most 200 characters')
-            .nullable(),
-
-        additionalInfo: yup
-            .string()
-            .max(200, 'Additional info must be at most 200 characters')
-            .nullable(),
-    });
-
+    const { form, onSubmit } = useUpdateProfile();
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
-        resolver: yupResolver(userProfileSchema),
-    });
+    } = form;
 
-    if (!isProfileOpen) return null;
-
-    const onSubmit = async (data) => {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/update-profile`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-            const resData = await res.json();
-            console.log(resData)
-            setUserStore(resData.user)
-            onClose()
-            toast.success(resData.message)
-        } catch (err) {
-            toast.error('Something Went Wrong!')
-        }
-    };
+    if (!isOpen) return null;
 
     return (
         <div

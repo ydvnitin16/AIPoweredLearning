@@ -1,10 +1,11 @@
+import { BadgeQuestionMarkIcon } from 'lucide-react';
 import { useState } from 'react';
 
 function QuizQuestion({ q, i }) {
     const [selected, setSelected] = useState(null);
 
     return (
-        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5">
+         <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-4 sm:p-5">
             <p className="font-medium mb-2">
                 {i + 1}. {q.question}
             </p>

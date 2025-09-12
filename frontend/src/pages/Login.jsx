@@ -53,7 +53,7 @@ const Login = () => {
             toast.success(resData.message);
             setUserStore(resData.user);
             reset();
-            navigate('/');
+            navigate('/dashboard');
         } catch (error) {
             toast.error(error.message || 'Something went wrong!');
         } finally {
@@ -118,7 +118,11 @@ const Login = () => {
                             </div>
 
                             {/* Submit Button */}
-                            <Button type="submit" name="Login" />
+                            <Button
+                                type="submit"
+                                className={`text-white`}
+                                name="Login"
+                            />
                         </form>
 
                         {/* Divider */}
@@ -133,10 +137,7 @@ const Login = () => {
                         {/* Sign Up Redirect */}
                         <Button
                             name="Sign Up"
-                            color="black"
-                            bgColor="white"
-                            borderColor="black"
-                            borderPx="001px"
+                            className={`text-black bg-white border border-black`}
                             onClick={() => navigate('/signup')}
                         />
                     </div>

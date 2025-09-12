@@ -189,6 +189,10 @@ const deleteSubject = async (req, res) => {
                 .status(403)
                 .json({ message: 'You not allowed to delete this subject' });
 
+        const user = await User.findById(req.user.id);
+        user.subjects = user.subjects.filter((id) => id.valueOf() !== subjectId);
+        await user.save();
+
         const result = await Topic.deleteMany({ subjectId: subjectId });
         await Subject.findByIdAndDelete(subjectId);
         res.status(200).json({

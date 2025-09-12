@@ -147,49 +147,7 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen flex flex-col font-sans text-slate-800 dark:bg-zinc-900">
             {/* Navbar */}
-            <header className="w-full sticky top-0 z-50 backdrop-blur border-gray-700 border-b-[0.1px]">
-                <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
-                    <a
-                        href="#home"
-                        className="text-2xl font-extrabold bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent"
-                    >
-                        AI Learn
-                    </a>
-                    <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-700">
-                        {[
-                            { href: '#features', label: 'Features' },
-                            { href: '#specialties', label: 'Why Us' },
-                            { href: '#pricing', label: 'Pricing' },
-                            { href: '#docs', label: 'Docs' },
-                            { href: '#contact', label: 'Contact' },
-                        ].map((item) => (
-                            <a
-                                key={item.href}
-                                href={item.href}
-                                className="relative group"
-                            >
-                                {item.label}
-                                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 transition-all duration-300 group-hover:w-full" />
-                            </a>
-                        ))}
-                    </nav>
-                    <div className="hidden md:block min-w-[140px]">
-                        <Button
-                            onClick={()=>navigate('/login')}
-                            name="Get Started"
-                            bgColor="#4f46e5"
-                        />
-                    </div>
-                    <div className="md:hidden">
-                        <Button
-                            onClick={()=>navigate('/login')}
-                            name="Get Started"
-                            bgColor="#4f46e5"
-                            width="7rem"
-                        />
-                    </div>
-                </div>
-            </header>
+            
 
             {/* Hero Section */}
             <section

@@ -4,6 +4,7 @@ const Button = ({
     type,
     name,
     onClick,
+    className,
     color,
     bgColor,
     borderPx,
@@ -16,7 +17,7 @@ const Button = ({
         <button
             type={type}
             onClick={onClick}
-            className="w-full bg-[#0F172A] text-white py-2 rounded-full font-semibold cursor-pointer"
+            className={(`w-full bg-[#0F172A] py-2 rounded-full font-semibold cursor-pointer ${className}`)}
             style={{
                 backgroundColor: bgColor,
                 color: color,

@@ -10,4 +10,8 @@ function getColorFromLetter(title) {
     return `hsl(${hue}, 70%, 50%)`; // HSL color string
 }
 
-export { getColorFromLetter };
+const isValidObjectId = (id) => {
+    return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
+export { getColorFromLetter, isValidObjectId };

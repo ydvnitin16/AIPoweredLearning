@@ -1,240 +1,50 @@
 import { useEffect, useState } from 'react';
-import {
-    Plus,
-    Settings,
-    CheckCircle,
-    Pencil,
-    Trash2,
-    Sparkles,
-    Lock,
-    Earth,
-} from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
-import { useNavigate } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import TopicPromptFormModal from '../components/form/TopicPromptFormModal.jsx';
-import { getColorFromLetter } from '../services/utils.js';
-import SuggestedTopicCard from '../components/common/SuggestedTopicCard.jsx';
-import CardLoading from '../components/common/CardLoading.jsx';
+import { useTopics } from '../hooks/UseTopics.jsx';
+import SubjectHeader from '../components/subject/SubjectHeader.jsx';
+import RenderTopicsList from '../components/subject/RenderTopicsList.jsx';
+import RenderSuggestedTopics from '../components/subject/RenderSuggestedTopics.jsx';
+import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 
 export default function SubjectPage() {
-    const [isGenerating, setIsGenerating] = useState();
-    const [isOpen, setIsOpen] = useState();
-    const navigate = useNavigate();
+    const [isTopicPromptModalOpen, setIsTopicPromptModalOpen] = useState();
+    const [topicGeneratingQueue, setTopicGeneratingQueue] = useState(0);
+    const { data: topics, isLoading, isError } = useTopics();
+
     const selectedSubject = UseSelectedSubjectTopic((s) => s.selectedSubject);
-    const setSelectedTopic = UseSelectedSubjectTopic((s) => s.setSelectedTopic);
     const setSelectedSubjects_Topics = UseSelectedSubjectTopic(
         (s) => s.setSelectedSubjects_Topics
     );
 
-    const [subject] = useState({
-        id: 1,
-        title: 'Mathematics',
-        color: 'from-indigo-500 to-purple-600',
-        progress: 60,
-    });
-
-    const {
-        data: topics,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: ['topics', selectedSubject?._id],
-        enabled: !!selectedSubject?._id,
-        queryFn: () =>
-            selectedSubject &&
-            fetch(
-                `${import.meta.env.VITE_SERVER_URL}/${
-                    selectedSubject?._id
-                }/topics`,
-                {
-                    credentials: 'include',
-                }
-            )
-                .then((r) => r.json())
-                .then((d) => d.topics),
-    });
-
     useEffect(() => {
-        if (selectedSubject?._id) {
-            // push into Zustand whenever topics change
-            setSelectedSubjects_Topics(selectedSubject._id, topics);
-        }
+        setSelectedSubjects_Topics(selectedSubject?._id, topics);
     }, [topics, selectedSubject?._id, setSelectedSubjects_Topics]);
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-    const [isPublic, setIsPublic] = useState();
-
-    async function handlePublicToggle(e) {
-        setIsPublic(e.target.checked);
-        const formatted = {
-            isPublic: e.target.checked,
-            subjectId: selectedSubject?._id,
-        };
-        console.log(formatted);
-        const res = await fetch(
-            `${import.meta.env.VITE_SERVER_URL}/subjects/public`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify(formatted),
-            }
-        );
-        console.log(res);
-        const data = await res.json();
-        console.log(data);
-    }
 
     return (
         <>
             <TopicPromptFormModal
-                setIsGenerating={setIsGenerating}
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
+                setTopicGeneratingQueue={setTopicGeneratingQueue}
+                isOpen={isTopicPromptModalOpen}
+                onClose={() => setIsTopicPromptModalOpen(false)}
             />
             <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors">
                 {/* Subject Header */}
-                <header
-                    className={`relative p-8 md:p-10 text-white rounded-b-3xl shadow-lg bg-gradient-to-r `}
-                    style={{
-                        backgroundColor: getColorFromLetter(
-                            selectedSubject?.title
-                        ),
-                    }}
-                >
-                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold">
-                                {selectedSubject?.title}
-                            </h1>
-                            <p className="mt-2 text-sm/relaxed opacity-90">
-                                Progress: {selectedSubject?.progress ?? 0}%
-                            </p>
-                            <div className="h-2 w-48 bg-white/30 rounded-full mt-2 overflow-hidden">
-                                <div
-                                    className="h-full bg-white rounded-full"
-                                    style={{
-                                        width: `${
-                                            selectedSubject?.progress ?? 0
-                                        }%`,
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-3">
-                            <button
-                                onClick={() => {
-                                    setIsOpen(true);
-                                }}
-                                className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition flex items-center gap-1"
-                            >
-                                <Sparkles size={16} /> Add Topic (AI)
-                            </button>
-                            <button
-                                onClick={() => navigate('/revision')}
-                                className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition"
-                            >
-                                Revise
-                            </button>
-                            <label class="inline-flex items-center cursor-pointer ">
-                                <input
-                                    type="checkbox"
-                                    checked={isPublic}
-                                    defaultChecked={selectedSubject?.isPublic}
-                                    onChange={(e) => handlePublicToggle(e)}
-                                    className="sr-only peer"
-                                />
-                                <Lock size={17} />
-                                <div className="mx-2 relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
-                                <Earth size={17} />
-                            </label>
-                        </div>
-                    </div>
-                </header>
+                <SubjectHeader
+                    setIsTopicPromptModalOpen={setIsTopicPromptModalOpen}
+                />
 
                 {/* Topics */}
                 <main className="max-w-7xl mx-auto p-6 md:p-8">
-                    <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
-                        Topics
-                    </h2>
+                    <RenderTopicsList
+                        topics={topics}
+                        isLoading={isLoading}
+                        isError={isError}
+                        loadingQueue={topicGeneratingQueue}
+                        msg={`Topic Generating ${topicGeneratingQueue} in queue`}
+                    />
 
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {topics?.map((topic) => (
-                            <div
-                                key={topic._id}
-                                onClick={() => {
-                                    setSelectedTopic(topic);
-                                    navigate('/topic');
-                                }}
-                                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow hover:shadow-lg transition group relative cursor-pointer"
-                            >
-                                <h3 className="text-base md:text-lg font-semibold text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
-                                    {topic.done && (
-                                        <CheckCircle
-                                            size={18}
-                                            className="text-green-500"
-                                        />
-                                    )}
-                                    {topic.topic}
-                                </h3>
-                                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-                                    {topic?.status
-                                        ? 'Completed'
-                                        : 'In Progress'}
-                                </p>
-
-                                {/* Hover Actions */}
-                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                                    <button
-                                        className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-zinc-700"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <Pencil
-                                            size={16}
-                                            className="text-indigo-600"
-                                        />
-                                    </button>
-                                    <button
-                                        className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <Trash2
-                                            size={16}
-                                            className="text-red-600"
-                                        />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                        {isGenerating && (
-                            <CardLoading msg="Generating Topic..." />
-                        )}
-                    </div>
-                    {selectedSubject?.suggestedTopics.length > 0 && (
-                        <h2 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6">
-                            <span
-                                className="text-md px-4 py-1 
-                             bg-indigo-100 dark:bg-indigo-900/60 
-                             text-indigo-600 dark:text-indigo-400 
-                             rounded-full font-medium mr-3"
-                            >
-                                AI
-                            </span>
-                            Suggested Topics
-                        </h2>
-                    )}
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-                        {selectedSubject?.suggestedTopics?.map((topicName) => (
-                            <SuggestedTopicCard topicName={topicName} />
-                        ))}
-                    </div>
+                    <RenderSuggestedTopics setTopicGeneratingQueue={setTopicGeneratingQueue} />
                 </main>
 
                 {/* Floating Add Button */}
