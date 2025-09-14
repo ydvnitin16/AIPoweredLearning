@@ -4,17 +4,17 @@ function createUserConfig(body, user) {
         subject: body.subject,
         prompt: body.prompt,
         flashcards: {
-            enabled: body.flashcards.enabled,
-            count: body.flashcards.count,
+            enabled: body.flashcards?.enabled,
+            count: body.flashcards?.count,
         },
         quizzes: {
-            enabled: body.quizzes.enabled,
-            count: body.quizzes.count,
+            enabled: body.quizzes?.enabled,
+            count: body.quizzes?.count,
         },
         practiceQuestions: {
-            enabled: body.practiceQuestions.enabled,
-            difficulty: body.practiceQuestions.difficulty,
-            count: body.practiceQuestions.count,
+            enabled: body.practiceQuestions?.enabled,
+            difficulty: body.practiceQuestions?.difficulty,
+            count: body.practiceQuestions?.count,
         },
         userProfile: {
             bio: user.bio,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getColorFromLetter } from '../../services/utils';
 
 const Navbar = ({ user, setIsProfileModalOpen, setIsLogoutModalOpen }) => {
     const navigate = useNavigate();
@@ -40,7 +41,8 @@ const Navbar = ({ user, setIsProfileModalOpen, setIsLogoutModalOpen }) => {
                     className="flex items-center gap-2 px-3 py-2 rounded-full dark:bg-zinc-900 bg-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition cursor-pointer
                         dark:text-white text-sm font-semibold"
                 >
-                    <div className="size-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                    <div className="size-8 rounded-full bg-gray-500 flex items-center justify-center text-white"
+                    style={{backgroundColor: getColorFromLetter(user?.name)}}>
                         {user?.name?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <span>{user?.name.split(' ')[0]|| 'User'}</span> 

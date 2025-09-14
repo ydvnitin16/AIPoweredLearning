@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { Plus, BookOpen, Compass, ArrowDownCircle } from 'lucide-react';
+import {
+    Plus,
+    BookOpen,
+    Compass,
+    ArrowDownCircle,
+    Sparkle,
+    Megaphone,
+} from 'lucide-react';
 import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
 import ImportSubject from '../components/form/ImportSubject.jsx';
 import { useSubjects } from '../hooks/UseSubjects.jsx';
@@ -7,7 +14,6 @@ import { useImportedSubjects } from '../hooks/UseImportedSubjects.jsx';
 import { usePublicSubjects } from '../hooks/UsePublicSubjects.jsx';
 import RenderSubjectList from '../components/subject/RenderSubjectList.jsx';
 import SubjectNav from '../components/common/SubjectNav.jsx';
-import CardLoading from '../components/common/CardLoading.jsx';
 
 export default function Dashboard() {
     const [isSubjectModalOpen, setIsSubjectModalOpen] = useState();
@@ -53,8 +59,8 @@ export default function Dashboard() {
                                     <Plus size={18} /> Add Subject
                                 </button>
                             </div>
-                            {/* Render all the subjects */}
 
+                            {/* Render My Subjects */}
                             <RenderSubjectList
                                 subjectHook={useSubjects}
                                 loadingQueue={subjectCreatingQueue}
@@ -81,6 +87,13 @@ export default function Dashboard() {
                                     <span>Import</span>
                                 </button>
                             </div>
+                            <p className="mx-auto max-w-5xl pb-4 px-4 opacity-80 text-sm text-zinc-800 dark:text-zinc-400 flex items-center gap-2">
+                                <Megaphone /> These subjects sharing the
+                                reference of the original subject all the action
+                                performed by the owner is reflected here.
+                            </p>
+
+                            {/* Render Imported Subjects */}
                             <RenderSubjectList
                                 subjectHook={useImportedSubjects}
                                 loadingQueue={subjectImportingQueue}
@@ -95,23 +108,14 @@ export default function Dashboard() {
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6 flex items-center gap-2">
                                 <Compass size={20} /> Explore Public Subjects
                             </h2>
+
+                            {/* Render Public Subjects */}
                             <RenderSubjectList
                                 subjectHook={usePublicSubjects}
                             />
                         </section>
                     )}
                 </main>
-
-                {/* Floating Button */}
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition
-                   bg-indigo-600 text-white hover:bg-indigo-700
-                   dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                    aria-label="Add Subject"
-                >
-                    <Plus size={24} />
-                </button>
             </div>
         </>
     );

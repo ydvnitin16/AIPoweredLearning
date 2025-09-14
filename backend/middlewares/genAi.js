@@ -12,7 +12,7 @@ const generateTopicExp = async (req, res, next) => {
     const prompt = buildPrompt(userConfig);
 
     try {
-        const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const model = GenAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
         console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
@@ -29,10 +29,10 @@ const generateTopicExp = async (req, res, next) => {
 };
 
 const getSuggestedTopics = async (req, res, next) => {
-    const { title } = req.body;
+    const { title, topics } = req.body;
     const prompt = `
     You are a curriculum assistant.
-        Given a ${title} subject, generate 10 highly relevant and logically ordered topics that a learner should study next. 
+        Given a ${title} subject ${topics ? `${topics} these topics are already done` : ''}, generate 10 highly relevant and logically ordered topics that a learner should study next. 
         - Input is a SUBJECT return subtopics covering the subject step by step.
         - Format your output strictly as a valid JSON array of strings:
         ["topic1", "topic2", "topic3", ...]
@@ -40,7 +40,7 @@ const getSuggestedTopics = async (req, res, next) => {
         Input: ${title}
         `;
     try {
-        const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const model = GenAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
         console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();

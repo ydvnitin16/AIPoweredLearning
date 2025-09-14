@@ -18,6 +18,8 @@ const createTopic = async (req, res) => {
                     "You are not allowed to create topic in other's Subject",
             });
 
+        subject.suggestedTopics = subject.suggestedTopics.filter(t => t !== topic);
+
         const newTopic = new Topic({
             subjectId: subjectId,
             topic: topic,

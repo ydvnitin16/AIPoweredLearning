@@ -3,6 +3,8 @@ import Button from '../common/Button.jsx';
 import FormInput from '../common/FormInput.jsx';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic.jsx';
 import { useTopicForm } from '../../hooks/UseTopicForm.jsx';
+import { Megaphone } from 'lucide-react';
+
 
 export default function TopicPromptFormModal({
     isOpen,
@@ -204,7 +206,7 @@ export default function TopicPromptFormModal({
                         height="45px"
                     />
                     <p className="mx-auto max-w-5xl px-4 pb-8 opacity-80 text-xs text-zinc-500 flex items-center gap-2">
-                 This setting will be applied to your next topic generations.
+                 <Megaphone /> This setting will be applied to your next topic generations.
             </p>
                 </form>
             </div>

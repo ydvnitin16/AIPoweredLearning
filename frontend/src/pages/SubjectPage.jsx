@@ -44,7 +44,7 @@ export default function SubjectPage() {
                         msg={`Topic Generating ${topicGeneratingQueue} in queue`}
                     />
 
-                    <RenderSuggestedTopics setTopicGeneratingQueue={setTopicGeneratingQueue} />
+                    <RenderSuggestedTopics setTopicGeneratingQueue={setTopicGeneratingQueue} topics={topics} />
                 </main>
 
                 {/* Floating Add Button */}

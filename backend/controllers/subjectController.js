@@ -35,6 +35,41 @@ const createSubject = async (req, res) => {
     }
 };
 
+const updateSubject = async (req, res) => {
+    const { title, subjectId } = req.body;
+    if (!title || typeof title !== 'string' || title.trim() === '') {
+        return res.status(400).json({ message: 'Please Give the Title' });
+    }
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const subject = await Subject.findById(subjectId);
+
+        if (!subject)
+            return res.status(404).json({ message: 'Subject not found' });
+
+        if (user._id.valueOf() !== subject.createdBy.valueOf()) {
+            return res.status(403).json({
+                message: "You can't generate suggestion in other's subject",
+            });
+        }
+
+        subject.suggestedTopics = req.suggestedTopics;
+        await subject.save();
+
+        res.status(201).json({
+            message: 'Suggestions generated successfully.',
+            subject: subject,
+        });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({
+            message: 'Server error. Please try again later.',
+        });
+    }
+};
+
 const getImportedSubjects = async (req, res) => {
     const { id } = req.user;
     try {
@@ -190,7 +225,9 @@ const deleteSubject = async (req, res) => {
                 .json({ message: 'You not allowed to delete this subject' });
 
         const user = await User.findById(req.user.id);
-        user.subjects = user.subjects.filter((id) => id.valueOf() !== subjectId);
+        user.subjects = user.subjects.filter(
+            (id) => id.valueOf() !== subjectId
+        );
         await user.save();
 
         const result = await Topic.deleteMany({ subjectId: subjectId });
@@ -214,4 +251,5 @@ export {
     importSubject,
     getImportedSubjects,
     deleteSubject,
+    updateSubject
 };

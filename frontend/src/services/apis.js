@@ -110,6 +110,22 @@ async function logoutUser() {
     return await res.json();
 }
 
+async function generateSuggestions(data){
+    const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/subjects/suggestions`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+        const { message } = await res.json();
+        throw new Error(message || 'Failed to Generate Suggestions');
+    }
+    return await res.json();
+}
+
 export {
     fetchData,
     publicToggle,
@@ -117,5 +133,6 @@ export {
     updateProfile,
     importSubject,
     generateTopic,
-    logoutUser
+    logoutUser,
+    generateSuggestions
 };

@@ -24,7 +24,7 @@ const SuggestedTopicCard = ({ topicName, onGenerate }) => {
             <button
                 onClick={(e) => {
                     e.stopPropagation();
-                    onGenerate(topicName);
+                    onGenerate(topicName, setisGenerating);
                     setisGenerating(true)
                 }}
                 className={`px-3 py-1.5 text-md font-medium 
