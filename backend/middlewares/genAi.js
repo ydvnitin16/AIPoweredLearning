@@ -12,7 +12,7 @@ const generateTopicExp = async (req, res, next) => {
     const prompt = buildPrompt(userConfig);
 
     try {
-        const model = GenAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
