@@ -175,6 +175,7 @@ export default function LandingPage() {
                         </p>
                         <div className="mt-8 flex flex-wrap gap-4">
                             <Button
+                                onClick={() => navigate('/dashboard')}
                                 name="Start Free"
                                 bgColor="#facc15"
                                 color="#0f172a"
