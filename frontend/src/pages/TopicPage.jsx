@@ -2,7 +2,7 @@ import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import ContentRenderer from '../components/topics/contentRenderer.jsx';
+import ContentRenderer from '../components/topics/ContentRenderer.jsx';
 import { UseAuthStore } from '../stores/UseAuthStore.jsx';
 import RenderFlashcard from '../components/topics/RenderFlashcard.jsx';
 import QuizQuestion from '../components/topics/QuizQuestion.jsx';
@@ -131,8 +131,8 @@ export default function TopicPage() {
                             <label className="inline-flex w-full items-center cursor-pointer ">
                                 <input
                                     type="checkbox"
-                                    // defaultChecked={selectedTopic?.isDone}
-                                    // onChange={(e) => {handleMarkDone(e); console.log(selectedTopic)}}
+                                    defaultChecked={selectedTopic?.isDone}
+                                    onChange={(e) => {handleMarkDone(e); console.log(selectedTopic)}}
                                     className="sr-only peer"
                                 />
                                 <div

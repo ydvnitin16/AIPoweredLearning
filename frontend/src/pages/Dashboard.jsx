@@ -6,6 +6,8 @@ import {
     ArrowDownCircle,
     Sparkle,
     Megaphone,
+    Import,
+    Book,
 } from 'lucide-react';
 import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
 import ImportSubject from '../components/form/ImportSubject.jsx';
@@ -48,7 +50,7 @@ export default function Dashboard() {
                         <section className="mb-12">
                             <div className="flex justify-between sm:items-center gap-4 mb-6">
                                 <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                                    <BookOpen size={20} /> My Subjects
+                                    <Book /> My Subjects
                                 </h2>
                                 <button
                                     onClick={() => setIsSubjectModalOpen(true)}
@@ -73,7 +75,7 @@ export default function Dashboard() {
                         <section>
                             <div className="flex justify-between mb-5">
                                 <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                                    <Compass size={20} /> Imported Subjects
+                                    <Import /> Imported Subjects
                                 </h2>
                                 <button
                                     onClick={() => setIsImportModalOpen(true)}
@@ -106,7 +108,7 @@ export default function Dashboard() {
                     {subjectNav === 'public-subjects' && (
                         <section>
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 my-6 flex items-center gap-2">
-                                <Compass size={20} /> Explore Public Subjects
+                                <Compass /> Explore Public Subjects
                             </h2>
 
                             {/* Render Public Subjects */}

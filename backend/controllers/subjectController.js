@@ -2,6 +2,7 @@ import Subject from '../models/subjectModel.js';
 import User from '../models/userModel.js';
 import Topic from '../models/topicModel.js';
 import mongoose from 'mongoose';
+import Progress from '../models/progressModel.js';
 
 const createSubject = async (req, res) => {
     const { title } = req.body;
@@ -104,9 +105,58 @@ const getSubjects = async (req, res) => {
         const subjects = await Subject.find({
             createdBy: id,
         });
+
+        const subjectIds = subjects.map((sub) => sub._id);
+
+        // all topics of each subject
+        const topics = await Topic.find({ subjectId: { $in: subjectIds } });
+
+        const totalTopicsMap = {};
+
+        // count of topics for each subject
+        topics.forEach((topic) => {
+            const subId = topic.subjectId.valueOf();
+            totalTopicsMap[subId] = (totalTopicsMap[subId] || 0) + 1;
+        });
+
+        // fetch done topics
+        const progressRecords = await Progress.find({
+            userId: req.user.id,
+            subjectId: { $in: subjectIds },
+            isDone: true,
+        });
+
+        const doneTopicsMap = {};
+
+        // count of done topics for each subject
+        progressRecords.forEach((record) => {
+            const subId = record.subjectId.toString();
+            doneTopicsMap[subId] = (doneTopicsMap[subId] || 0) + 1;
+        });
+
+        const subjectWithProgress = subjects.map((subject) => {
+            const subId = subject._id.valueOf();
+            const totalTopics = totalTopicsMap[subId] || 0;
+            const doneTopics = doneTopicsMap[subId] || 0;
+            let progress = 0;
+            if (totalTopics > 0) {
+                progress = Math.round((doneTopics / totalTopics) * 100);
+            }
+            return {
+                _id: subject._id,
+                title: subject.title,
+                isPublic: subject.isPublic,
+                likes: subject.likes,
+                createdBy: subject.createdBy,
+                totalTopics: totalTopics,
+                doneTopics: doneTopics,
+                progress: progress,
+            };
+        });
+
         res.status(200).json({
             message: 'Fetched your subjects successfully.',
-            subjects: subjects || [],
+            subjects: subjectWithProgress || [],
         });
     } catch (err) {
         console.log(err.message);
@@ -251,5 +301,5 @@ export {
     importSubject,
     getImportedSubjects,
     deleteSubject,
-    updateSubject
+    updateSubject,
 };

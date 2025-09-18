@@ -18,6 +18,7 @@ export default function SubjectPage() {
     );
 
     useEffect(() => {
+        console.log(selectedSubject)
         setSelectedSubjects_Topics(selectedSubject?._id, topics);
     }, [topics, selectedSubject?._id, setSelectedSubjects_Topics]);
 
