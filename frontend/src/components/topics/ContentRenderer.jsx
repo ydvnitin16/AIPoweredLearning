@@ -4,7 +4,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import {
+    vs,
+    vscDarkPlus,
+} from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render.js';
@@ -125,14 +128,20 @@ const ContentRenderer = ({ obj, idx }) => {
             return (
                 <section
                     key={`viz-${idx}`}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 sm:p-6 rounded-xl shadow-md overflow-auto"
+                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 
+               p-4 sm:p-6 rounded-xl shadow-md"
                 >
                     {obj.heading && (
                         <h2 className="text-xl sm:text-2xl font-bold mb-2">
                             {obj.heading}
                         </h2>
                     )}
-                    <div ref={vizRef} />
+
+                    {/* Outer wrapper: prevents screen overflow */}
+                    <div className="w-full overflow-x-auto">
+                        {/* Inner wrapper: where viz.js injects the SVG */}
+                        <div ref={vizRef} className="viz-wrapper" />
+                    </div>
                 </section>
             );
         },
@@ -153,7 +162,6 @@ const ContentRenderer = ({ obj, idx }) => {
                         </h2>
                     )}
                     <ReactFlow nodes={nodes} edges={edges}>
-                        <MiniMap />
                         <Controls />
                         <Background />
                     </ReactFlow>
