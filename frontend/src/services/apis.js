@@ -110,18 +110,42 @@ async function logoutUser() {
     return await res.json();
 }
 
-async function generateSuggestions(data){
-    const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/subjects/suggestions`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-    });
+async function generateSuggestions(data) {
+    const res = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/subjects/suggestions`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        }
+    );
     if (!res.ok) {
         const { message } = await res.json();
         throw new Error(message || 'Failed to Generate Suggestions');
+    }
+    return await res.json();
+}
+
+async function toggleMarkAsDone(data) {
+    console.log(data)
+    const res = await fetch(
+        `${import.meta.env.VITE_SERVER_URL}/topics/status`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(data),
+        }
+    );
+    console.log(res)
+    if (!res.ok) {
+        const { message } = await res.json();
+        throw new Error(message || 'Failed to Set Status');
     }
     return await res.json();
 }
@@ -134,5 +158,6 @@ export {
     importSubject,
     generateTopic,
     logoutUser,
-    generateSuggestions
+    generateSuggestions,
+    toggleMarkAsDone,
 };

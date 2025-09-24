@@ -4,9 +4,6 @@ import SuggestedTopicCard from '../common/SuggestedTopicCard';
 import { useTopicForm } from '../../hooks/UseTopicForm';
 import { useFormStore } from '../../stores/UseTopicFormStore';
 import { Megaphone, RefreshCw, Repeat } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useQueryClient } from '@tanstack/react-query';
-import { generateSuggestions } from '../../services/apis';
 import { useGenerateSuggestions } from '../../hooks/UseGenerateSuggestions';
 
 const RenderSuggestedTopics = ({ setTopicGeneratingQueue, topics }) => {

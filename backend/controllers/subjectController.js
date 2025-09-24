@@ -148,6 +148,7 @@ const getSubjects = async (req, res) => {
                 isPublic: subject.isPublic,
                 likes: subject.likes,
                 createdBy: subject.createdBy,
+                suggestedTopics: subject.suggestedTopics,
                 totalTopics: totalTopics,
                 doneTopics: doneTopics,
                 progress: progress,

@@ -134,6 +134,7 @@ const markAsDone = async (req, res) => {
     if (typeof isDone !== 'boolean') {
         return res.status(400).json({ message: 'isDone must be a boolean' });
     }
+    console.log('Serching')
 
     try {
         const subject = await Subject.findById(subjectId);
@@ -145,7 +146,7 @@ const markAsDone = async (req, res) => {
         if (!topic) {
             return res.status(404).json({ message: 'Topic not found' });
         }
-        if (topic.subjectId.valueOf() !== subjectId) {
+        if (topic.subjectId.toString() !== subjectId.toString()) {
             return res
                 .status(400)
                 .json({ message: 'Topic does not belong to this subject' });

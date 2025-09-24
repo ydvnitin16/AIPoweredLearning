@@ -7,6 +7,8 @@ import { UseAuthStore } from '../stores/UseAuthStore.jsx';
 import RenderFlashcard from '../components/topics/RenderFlashcard.jsx';
 import QuizQuestion from '../components/topics/QuizQuestion.jsx';
 import PracticeQuestion from '../components/topics/PracticeQuestion.jsx';
+import { useMarkAsDone } from '../hooks/UseMarkAsDone.jsx';
+import { useState } from 'react';
 
 export default function TopicPage() {
     const navigate = useNavigate();
@@ -20,6 +22,24 @@ export default function TopicPage() {
     const quizzes = selectedTopic?.output?.quizzes || [];
     const revision = selectedTopic?.output?.revision || null;
     const practiceQuestions = selectedTopic?.output?.practiceQuestions || [];
+
+    const { markAsDone, loading, error } = useMarkAsDone();
+    const [isDone, setIsDone] = useState(selectedTopic?.isDone || false);
+
+    const handleMarkDone = async (e) => {
+        const checked = e.target.checked;
+        setIsDone(checked); // optimistic UI update
+
+        const updated = await markAsDone({
+            subjectId: selectedSubject?._id,
+            topicId: selectedTopic._id,
+            isDone: checked,
+        });
+
+        if (!updated) {
+            setIsDone(!checked);
+        }
+    };
 
     return (
         <div className="min-h-screen max-full bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
@@ -128,21 +148,21 @@ export default function TopicPage() {
                     {selectedSubject?.createdBy === userStore.id && (
                         <aside className="space-y-4 sm:space-y-6">
                             {/* Mark as done */}
-                            <label className="inline-flex w-full items-center cursor-pointer ">
+                            <label className="inline-flex w-full items-center cursor-pointer">
                                 <input
                                     type="checkbox"
-                                    defaultChecked={selectedTopic?.isDone}
-                                    onChange={(e) => {handleMarkDone(e); console.log(selectedTopic)}}
+                                    defaultChecked={isDone}
+                                    onChange={(e) => handleMarkDone(e)}
                                     className="sr-only peer"
                                 />
                                 <div
                                     className={`text-center px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
-                                        ''
+                                        isDone
                                             ? 'bg-green-500 hover:bg-green-600 text-white'
                                             : 'bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 hover:bg-zinc-300 text-zinc-900 dark:text-white'
                                     }`}
                                 >
-                                    {'' ? 'Done' : 'Mark As Done'}
+                                    {loading ? "Loading" : isDone ? 'Done' : 'Mark As Done'}
                                 </div>
                             </label>
 

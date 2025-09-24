@@ -70,11 +70,18 @@ Follow this example schema strictly:
 }
 
 Rules:
-- Explanations: clear, structured, ${
-        config.userProfile.preference || 'college-level'
-    }.
-- Content: supported types ['text', 'code', 'formula']
-- Code: always include inline comments.
+- Explanations: clear, structured, ${config.userProfile.preference || ''}.
+- Content: supported types ['text', 'code', 'formula', 'viz', 'reactflow', 'image', 'table']
+- Code: always include inline comments; heading must specify language , "extension" this include the extension of the language (eg. jsx, cpp...)
+- image: use when a visual real-world representation, conceptual diagram, or illustration would teach better than text or Mermaid. 'data' must be a direct valid image URL from a reliable source.
+- Viz (Graphviz):
+  - Use when rendering complex graph structures or DAGs.
+  - Accept DOT format strings; ensure proper syntax and unique node identifiers.
+- React Flow:
+  - Use for interactive node/edge diagrams where user interaction is beneficial.
+  - Define nodes and edges in JSON format; ensure unique IDs.
+- Choose between react flow, viz and images based on which provides **clearer teaching value** for the concept.
+- table: 'data' must be an object { "headers": [...], "rows": [[...], [...]] }, use for tables, Difference between, VS, etc
 - ${flashcardRule}
 - ${quizRule}
 - ${practiceRule}
