@@ -122,19 +122,11 @@ const deleteTopic = async (req, res) => {
 };
 
 const markAsDone = async (req, res) => {
-    const userId = mongoose.Types.ObjectId(req.user._id); // Logged-in user
     const { subjectId, topicId, isDone } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-        return res.status(400).json({ message: 'Invalid subjectId' });
-    }
-    if (!mongoose.Types.ObjectId.isValid(topicId)) {
-        return res.status(400).json({ message: 'Invalid topicId' });
-    }
     if (typeof isDone !== 'boolean') {
         return res.status(400).json({ message: 'isDone must be a boolean' });
     }
-    console.log('Serching')
 
     try {
         const subject = await Subject.findById(subjectId);
@@ -154,7 +146,7 @@ const markAsDone = async (req, res) => {
 
         const progress = await Progress.findOneAndUpdate(
             {
-                userId,
+                userId: req.user.id,
                 subjectId,
                 topicId,
             },

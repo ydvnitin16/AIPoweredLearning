@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { UseAuthStore } from '../stores/UseAuthStore';
 import toast from 'react-hot-toast';
 import Navbar from '../components/common/Navbar';
-import SubjectFormModal from '../components/form/SubjectFormModal';
 import UpdateProfileModal from '../components/form/UpdateProfileModal';
 import ConfirmModal from '../components/common/ConfirmModal';
 import { logoutUser } from '../services/apis';
 
 const MainLayout = () => {
+    const queryClient = useQueryClient();
     const isAuthExpired = UseAuthStore((state) => state.isAuthExpired);
     const clearUserStore = UseAuthStore((state) => state.clearUserStore);
     const userStore = UseAuthStore((state) => state.userStore);
@@ -28,7 +29,8 @@ const MainLayout = () => {
             const data = await logoutUser();
             clearUserStore();
             toast.success(data.message);
-            navigate('/login')
+            queryClient.invalidateQueries({ queryKey: ['subjects'] });
+            navigate('/login');
         } catch (err) {
             toast.error('Failed to logout Sorry!');
         }
