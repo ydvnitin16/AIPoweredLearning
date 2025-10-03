@@ -1,17 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic.jsx';
-import { useSubjects } from '../../hooks/UseSubjects.jsx';
 import { getColorFromLetter } from '../../services/utils.js';
 import CardLoading from '../common/CardLoading.jsx';
+import { Trash2 } from 'lucide-react';
+import { UseAuthStore } from '../../stores/UseAuthStore.jsx';
 
-const RenderSubjectList = ({ subjectHook, loadingQueue, msg }) => {
+const RenderSubjectList = ({
+    subjectHook,
+    loadingQueue,
+    msg,
+    deleteSubject,
+}) => {
     const navigate = useNavigate();
     const setSelectedSubject = UseSelectedSubjectTopic(
         (state) => state.setSelectedSubject
     );
-
+    const userStore = UseAuthStore((state) => state.userStore);
+    console.log(userStore);
     const { data: subjects, isLoading, isError } = subjectHook();
 
     if (!subjects?.length && loadingQueue > 0) {
@@ -87,6 +93,17 @@ const RenderSubjectList = ({ subjectHook, loadingQueue, msg }) => {
                     <p className="text-sm text-white/90">
                         Progress: {subj.progress}%
                     </p>
+                    {userStore.id === subj?.createdBy && (
+                        <button
+                            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100  transition-opacity duration-200 p-1 backdrop-blur-3xl bg-black/50 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700 cursor-pointer"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSubject.mutate(subj._id);
+                            }}
+                        >
+                            <Trash2 size={16} className="text-red-600" />
+                        </button>
+                    )}
                 </div>
             ))}
             {loadingQueue > 0 && <CardLoading msg={msg} />}

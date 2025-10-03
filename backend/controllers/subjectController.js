@@ -3,7 +3,7 @@ import User from '../models/userModel.js';
 import Topic from '../models/topicModel.js';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from "cloudinary";
-import Progress from '../models/progressModel.js';
+import Progress from '../models/progressModel.js'
 
 const createSubject = async (req, res) => {
     const { title } = req.body;
@@ -324,7 +324,7 @@ const deleteSubject = async (req, res) => {
         await Subject.findByIdAndDelete(subjectId);
 
         res.status(200).json({
-            message: `Subject deleted. ${topicResult.deletedCount} topics and ${progressResult.deletedCount} progress records (plus related images) removed successfully.`,
+            message: `Subject deleted. ${topicResult.deletedCount ? `${topicResult.deletedCount} topics,` : ''} ${progressResult.deletedCount ? `${progressResult.deletedCount} progress records` : ''}, related images removed successfully.`,
         });
     } catch (err) {
         console.error(err);
@@ -333,6 +333,35 @@ const deleteSubject = async (req, res) => {
         });
     }
 };
+
+const deleteImportedSubject = async (req, res) => {
+    const { subjectId } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+        return res.status(400).json({ message: "Invalid subject ID." });
+    }
+
+    try {
+        const subject = await Subject.findById(subjectId);
+
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+
+        const user = await User.findById(req.user.id);
+        user.importedSubjects = user.importedSubjects.filter(s => s.toString() !== subjectId);
+        await user.save()
+
+
+        res.status(200).json({
+            message: `Subject deleted.`,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            message: "Server error. Please try again later.",
+        });
+    }
+}
 
 export {
     createSubject,
@@ -343,4 +372,5 @@ export {
     getImportedSubjects,
     deleteSubject,
     updateSubject,
+    deleteImportedSubject
 };

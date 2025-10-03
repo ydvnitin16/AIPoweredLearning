@@ -130,7 +130,7 @@ async function generateSuggestions(data) {
 }
 
 async function toggleMarkAsDone(data) {
-    console.log(data)
+    console.log(data);
     const res = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/topics/status`,
         {
@@ -142,10 +142,27 @@ async function toggleMarkAsDone(data) {
             body: JSON.stringify(data),
         }
     );
-    console.log(res)
+    console.log(res);
     if (!res.ok) {
         const { message } = await res.json();
         throw new Error(message || 'Failed to Set Status');
+    }
+    return await res.json();
+}
+
+async function deleteData(url, data) {
+    const res = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+        const { message } = await res.json();
+        console.log(message);
+        throw new Error(message || 'Failed to fetch data');
     }
     return await res.json();
 }
@@ -160,4 +177,5 @@ export {
     logoutUser,
     generateSuggestions,
     toggleMarkAsDone,
+    deleteData,
 };

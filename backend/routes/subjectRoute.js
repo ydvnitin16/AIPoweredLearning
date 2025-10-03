@@ -8,6 +8,7 @@ import {
     getImportedSubjects,
     deleteSubject,
     updateSubject,
+    deleteImportedSubject,
 } from '../controllers/subjectController.js';
 import { auth } from '../middlewares/auth.js';
 import { getSuggestedTopics } from '../middlewares/genAi.js';
@@ -20,6 +21,7 @@ router.get('/imported-subjects', auth, getImportedSubjects);
 router.put('/subjects/public', auth, updateIsPublicStatus);
 router.post('/subjects/import', auth, importSubject);
 router.delete('/subjects', auth, deleteSubject);
+router.delete('/imported-subjects', auth, deleteImportedSubject);
 router.put('/subjects/suggestions', auth, getSuggestedTopics, updateSubject);
 
 export default router;

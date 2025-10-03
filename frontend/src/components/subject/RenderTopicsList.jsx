@@ -2,24 +2,39 @@ import { useNavigate } from 'react-router';
 import { CheckCircle, Pencil, Trash2 } from 'lucide-react';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic';
 import CardLoading from '../../components/common/CardLoading';
+import { UseAuthStore } from '../../stores/UseAuthStore';
 
-const RenderTopicsList = ({ topics, isLoading, isError, loadingQueue, msg }) => {
+const RenderTopicsList = ({
+    topics,
+    isLoading,
+    isError,
+    loadingQueue,
+    msg,
+    deleteTopic,
+}) => {
     const setSelectedTopic = UseSelectedSubjectTopic((s) => s.setSelectedTopic);
     const navigate = useNavigate();
 
-    if(!topics?.length && loadingQueue > 0){
-        return <CardLoading msg={msg} />
+    const selectedSubject = UseSelectedSubjectTopic(
+        (state) => state.selectedSubject
+    );
+    const userStore = UseAuthStore((state) => state.userStore);
+
+    if (!topics?.length && loadingQueue > 0) {
+        return <CardLoading msg={msg} />;
     }
 
     if (isLoading) {
-        return <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4">
-            {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                <CardLoading />
-            ))}
-        </div>;
+        return (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4">
+                {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                    <CardLoading />
+                ))}
+            </div>
+        );
     }
 
-    if(isError){
+    if (isError) {
         return (
             <div className="p-4 text-red-600">
                 <h2 className="text-lg font-bold mb-2">Topics</h2>
@@ -65,20 +80,31 @@ const RenderTopicsList = ({ topics, isLoading, isError, loadingQueue, msg }) => 
                         </p>
 
                         {/* Hover Actions */}
-                        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
-                            <button
-                                className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-zinc-700"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <Pencil size={16} className="text-indigo-600" />
-                            </button>
-                            <button
-                                className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                <Trash2 size={16} className="text-red-600" />
-                            </button>
-                        </div>
+                        {userStore.id === selectedSubject?.createdBy && (
+                            <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                <button
+                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-zinc-700"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <Pencil
+                                        size={16}
+                                        className="text-indigo-600"
+                                    />
+                                </button>
+                                <button
+                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteTopic.mutate(topic._id);
+                                    }}
+                                >
+                                    <Trash2
+                                        size={16}
+                                        className="text-red-600"
+                                    />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
                 {loadingQueue > 0 && <CardLoading msg={msg} />}

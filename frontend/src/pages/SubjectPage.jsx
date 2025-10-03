@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import TopicPromptFormModal from '../components/form/TopicPromptFormModal.jsx';
-import { useTopics } from '../hooks/UseTopics.jsx';
+import { useDeleteTopic, useTopics } from '../hooks/UseTopics.jsx';
 import SubjectHeader from '../components/subject/SubjectHeader.jsx';
 import RenderTopicsList from '../components/subject/RenderTopicsList.jsx';
 import RenderSuggestedTopics from '../components/subject/RenderSuggestedTopics.jsx';
@@ -16,6 +16,8 @@ export default function SubjectPage() {
     const setSelectedSubjects_Topics = UseSelectedSubjectTopic(
         (s) => s.setSelectedSubjects_Topics
     );
+
+    const deleteTopic = useDeleteTopic()
 
     useEffect(() => {
         console.log(selectedSubject)
@@ -43,6 +45,7 @@ export default function SubjectPage() {
                         isError={isError}
                         loadingQueue={topicGeneratingQueue}
                         msg={`Topic Generating ${topicGeneratingQueue} in queue`}
+                        deleteTopic={deleteTopic}
                     />
 
                     <RenderSuggestedTopics setTopicGeneratingQueue={setTopicGeneratingQueue} topics={topics} />

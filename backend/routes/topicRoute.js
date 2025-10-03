@@ -19,7 +19,7 @@ const uploads = multer({
 router.post('/topics', auth, generateTopicExp, createTopic);
 router.post('/create-topic', auth, uploads.array('images'), createTopic);
 router.get('/:id/topics', auth, getTopicsOfSubject);
-router.delete('/topics/delete', auth, deleteTopic);
+router.delete('/topics', auth, deleteTopic);
 router.put('/topics/status', auth, markAsDone);
 
 export default router;

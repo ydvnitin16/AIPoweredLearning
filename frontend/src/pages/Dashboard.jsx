@@ -11,8 +11,8 @@ import {
 } from 'lucide-react';
 import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
 import ImportSubject from '../components/form/ImportSubject.jsx';
-import { useSubjects } from '../hooks/UseSubjects.jsx';
-import { useImportedSubjects } from '../hooks/UseImportedSubjects.jsx';
+import { useDeleteSubject, useSubjects } from '../hooks/UseSubjects.jsx';
+import { useDeleteImportedSubject, useImportedSubjects } from '../hooks/UseImportedSubjects.jsx';
 import { usePublicSubjects } from '../hooks/UsePublicSubjects.jsx';
 import RenderSubjectList from '../components/subject/RenderSubjectList.jsx';
 import SubjectNav from '../components/common/SubjectNav.jsx';
@@ -22,6 +22,8 @@ export default function Dashboard() {
     const [isImportModalOpen, setIsImportModalOpen] = useState();
     const [subjectCreatingQueue, setSubjectCreatingQueue] = useState(0);
     const [subjectImportingQueue, setSubjectImportingQueue] = useState(0);
+    const deleteImportedSubject = useDeleteImportedSubject()
+    const deleteSubject = useDeleteSubject()
 
     const [subjectNav, setSubjectNav] = useState('my-subjects');
 
@@ -64,6 +66,7 @@ export default function Dashboard() {
 
                             {/* Render My Subjects */}
                             <RenderSubjectList
+                            deleteSubject={deleteSubject}
                                 subjectHook={useSubjects}
                                 loadingQueue={subjectCreatingQueue}
                                 msg={`creating subject ${subjectCreatingQueue} in queue`}
@@ -97,6 +100,7 @@ export default function Dashboard() {
 
                             {/* Render Imported Subjects */}
                             <RenderSubjectList
+                            deleteSubject={deleteImportedSubject}
                                 subjectHook={useImportedSubjects}
                                 loadingQueue={subjectImportingQueue}
                                 msg={`Importing subject ${subjectImportingQueue} in queue`}
