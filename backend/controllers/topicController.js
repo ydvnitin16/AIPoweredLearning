@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import Subject from '../models/subjectModel.js';
 import Topic from '../models/topicModel.js';
 import User from '../models/userModel.js';
@@ -6,8 +7,11 @@ import Progress from '../models/progressModel.js';
 
 const createTopic = async (req, res) => {
     const { subjectId, topic } = req.body;
-    const output = req.output;
+    let output = req.output || req.body.output;
     const revision = output.revision;
+    if (typeof output === 'string') {
+        output = JSON.parse(output);
+    }
     try {
         const subject = await Subject.findById(subjectId);
         if (!subject)
@@ -19,9 +23,14 @@ const createTopic = async (req, res) => {
                     "You are not allowed to create topic in other's Subject",
             });
 
+        console.log(subjectId, topic);
         subject.suggestedTopics = subject.suggestedTopics.filter(
             (t) => t !== topic
         );
+
+        if (req.files?.length) {
+            output = attachImagesToOutput(output, req.files);
+        }
 
         const newTopic = new Topic({
             subjectId: subjectId,
@@ -44,6 +53,25 @@ const createTopic = async (req, res) => {
         });
     }
 };
+
+function attachImagesToOutput(output, files) {
+    let fileIdx = 0;
+    output.content = output.content.map((block) => {
+        if (
+            block.type === 'image' &&
+            block.data?.placeholder &&
+            files[fileIdx]
+        ) {
+            block.data = {
+                url: files[fileIdx].path,
+                publicId: files[fileIdx].filename,
+            };
+            fileIdx++;
+        }
+        return block;
+    });
+    return output;
+}
 
 const getTopicsOfSubject = async (req, res) => {
     const { id } = req.params;
@@ -97,22 +125,49 @@ const getTopicsOfSubject = async (req, res) => {
 const deleteTopic = async (req, res) => {
     const { id } = req.body;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid subject ID.' });
+        return res.status(400).json({ message: 'Invalid topic ID.' });
     }
+
     try {
         const topic = await Topic.findById(id);
-        if (!topic)
+        if (!topic) {
             return res.status(404).json({ message: 'Topic not found.' });
+        }
 
         const subject = await Subject.findById(topic.subjectId);
-        if (subject.createdBy.valueOf() !== req.user.id)
+        if (!subject || subject.createdBy.toString() !== req.user.id) {
             return res.status(403).json({
                 message:
                     "You are not allowed to delete topic in other's Subject",
             });
+        }
 
+        // --- Delete Cloudinary images if present ---
+        if (topic.output?.content && Array.isArray(topic.output.content)) {
+            for (const block of topic.output.content) {
+                if (block.type === 'image' && block.data?.publicId) {
+                    try {
+                        await cloudinary.uploader.destroy(block.data.publicId);
+                        console.log(`Deleted image: ${block.data.publicId}`);
+                    } catch (err) {
+                        console.error(
+                            `Failed to delete image ${block.data.publicId}:`,
+                            err.message
+                        );
+                    }
+                }
+            }
+        }
+
+        // --- Delete progress records linked to this topic ---
+        const progressResult = await Progress.deleteMany({ topicId: id });
+
+        // --- Delete the topic itself ---
         await Topic.deleteOne({ _id: id });
-        res.status(200).json({ message: 'Topic deleted successfully.' });
+
+        res.status(200).json({
+            message: `Topic deleted successfully. Also removed ${progressResult.deletedCount} progress records and related images.`,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({

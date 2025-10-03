@@ -51,14 +51,24 @@ const SubjectHeader = ({ setIsTopicPromptModalOpen }) => {
                             onClick={() => {
                                 setIsTopicPromptModalOpen(true);
                             }}
-                            className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition flex items-center gap-1"
+                            className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition flex items-center gap-1 cursor-pointer"
                         >
                             <Sparkles size={16} /> Add Topic (AI)
                         </button>
                     )}
+
+                    {selectedSubject?.createdBy === userStore.id && (
+                        <button
+                            onClick={() => {navigate(`/create-topic/${selectedSubject._id}`)}}
+                            className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition flex items-center gap-1 cursor-pointer"
+                        >
+                            Create Topic
+                        </button>
+                    )}
+
                     <button
                         onClick={() => navigate('/revision')}
-                        className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition"
+                        className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl hover:bg-white/30 transition cursor-pointer"
                     >
                         Revise
                     </button>

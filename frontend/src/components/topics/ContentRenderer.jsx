@@ -93,12 +93,13 @@ const ContentRenderer = ({ obj, idx }) => {
             <section
                 key={`img-${idx}`}
                 className="bg-white dark:bg-zinc-800 p-3 sm:p-4 rounded-xl shadow-md"
-            >
+            >{obj.data &&
+                <div>
                 <img
-                    src={obj.data}
+                    src={obj?.data?.url}
                     alt={obj.heading ?? 'image'}
                     className="w-full rounded-lg object-cover"
-                />
+                /></div>}
             </section>
         ),
 

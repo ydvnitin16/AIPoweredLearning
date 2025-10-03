@@ -14,6 +14,7 @@ import SubjectPage from './pages/SubjectPage.jsx';
 import TopicPage from './pages/TopicPage.jsx';
 import LandingPage from './pages/LandingPage.jsx'
 import RevisionPage from './pages/RevisionPage.jsx';
+import CreateTopicPage from './pages/CreateTopicPage.jsx'
 
 function App() {
     const router = createBrowserRouter(
@@ -27,6 +28,7 @@ function App() {
                     <Route path='subject' element={<SubjectPage />} />
                     <Route path='topic' element={<TopicPage />} />
                     <Route path='revision' element={<RevisionPage />} />
+                    <Route path='create-topic/:subjectId' element={<CreateTopicPage />} />
 
                 </Route>
             </>

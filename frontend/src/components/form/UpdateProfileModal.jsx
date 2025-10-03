@@ -25,6 +25,7 @@ const UpdateProfileModal = ({ isOpen, onClose }) => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="w-full max-w-xl mx-auto backdrop-blur-sm dark:bg-zinc-800 bg-white shadow-lg rounded-xl p-6 space-y-4"
             >
+                <div className='text-black dark:text-white text-end'>~{userStore.email}</div>
                 {/* Name */}
                 <FormInput
                     label="Name"

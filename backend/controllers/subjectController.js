@@ -2,6 +2,7 @@ import Subject from '../models/subjectModel.js';
 import User from '../models/userModel.js';
 import Topic from '../models/topicModel.js';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from "cloudinary";
 import Progress from '../models/progressModel.js';
 
 const createSubject = async (req, res) => {
@@ -262,34 +263,73 @@ const importSubject = async (req, res) => {
 const deleteSubject = async (req, res) => {
     const { subjectId } = req.body;
     if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-        return res.status(400).json({ message: 'Invalid subject ID.' });
+        return res.status(400).json({ message: "Invalid subject ID." });
     }
+
     try {
         const subject = await Subject.findById(subjectId);
 
-        if (!subject)
-            return res.status(404).json({ message: 'Subject not found' });
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
 
-        if (subject.createdBy.valueOf() !== req.user.id)
-            return res
-                .status(403)
-                .json({ message: 'You not allowed to delete this subject' });
+        if (subject.createdBy.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "You not allowed to delete this subject",
+            });
+        }
 
+        // --- Remove subject reference from user ---
         const user = await User.findById(req.user.id);
         user.subjects = user.subjects.filter(
-            (id) => id.valueOf() !== subjectId
+            (id) => id.toString() !== subjectId
         );
         await user.save();
 
-        const result = await Topic.deleteMany({ subjectId: subjectId });
+        // --- Find all topics of this subject ---
+        const topics = await Topic.find({ subjectId });
+        const topicIds = topics.map((t) => t._id);
+
+        // --- Delete all Cloudinary images from each topic ---
+        for (const topic of topics) {
+            if (topic.output?.content && Array.isArray(topic.output.content)) {
+                for (const block of topic.output.content) {
+                    if (block.type === "image" && block.data?.publicId) {
+                        try {
+                            await cloudinary.uploader.destroy(
+                                block.data.publicId
+                            );
+                            console.log(
+                                `Deleted image: ${block.data.publicId}`
+                            );
+                        } catch (err) {
+                            console.error(
+                                `Failed to delete image ${block.data.publicId}:`,
+                                err.message
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Delete progress of all topics under this subject ---
+        const progressResult = await Progress.deleteMany({
+            subjectId,
+            topicId: { $in: topicIds },
+        });
+
+        // --- Delete topics and subject ---
+        const topicResult = await Topic.deleteMany({ subjectId });
         await Subject.findByIdAndDelete(subjectId);
+
         res.status(200).json({
-            message: `Subject and its ${result.deletedCount} topics deleted successfully.`,
+            message: `Subject deleted. ${topicResult.deletedCount} topics and ${progressResult.deletedCount} progress records (plus related images) removed successfully.`,
         });
     } catch (err) {
         console.error(err);
         res.status(500).json({
-            message: 'Server error. Please try again later.',
+            message: "Server error. Please try again later.",
         });
     }
 };
