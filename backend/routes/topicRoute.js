@@ -16,9 +16,9 @@ const uploads = multer({
     storage,
 });
 
-router.post('/topics', auth, generateTopicExp, createTopic);
+router.post('/generate-topic', auth, generateTopicExp, createTopic);
 router.post('/create-topic', auth, uploads.array('images'), createTopic);
-router.get('/:id/topics', auth, getTopicsOfSubject);
+router.get('/:subjectId/topics', auth, getTopicsOfSubject);
 router.delete('/topics', auth, deleteTopic);
 router.put('/topics/status', auth, markAsDone);
 

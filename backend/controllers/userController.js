@@ -1,6 +1,7 @@
 import User from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { throwError, handleError } from '../utils/helper.js';
 
 // user register -> Store user info to the DB
 const registerUser = async (req, res) => {
@@ -9,8 +10,7 @@ const registerUser = async (req, res) => {
         // Check is User already exists
         const existingUser = await User.findOne({ email });
 
-        if (existingUser)
-            return res.status(409).json({ message: 'Email already exists!' });
+        if (existingUser) throwError('Email already exists!', 409);
 
         // hash password & answer using bcrypt
         const hashPwd = await bcrypt.hash(password, 10);
@@ -24,10 +24,8 @@ const registerUser = async (req, res) => {
         await user.save();
 
         res.status(201).json({ message: 'Registered Successfully!' });
-    } catch (error) {
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+    } catch (err) {
+        handleError(res, err);
     }
 };
 
@@ -39,16 +37,14 @@ const loginUser = async (req, res) => {
         const userInfo = await User.findOne({ email });
 
         // If Email not found
-        if (!userInfo)
-            return res.status(404).json({ message: 'Invalid Credentials' });
+        if (!userInfo) throwError('Invalid Credentials', 404);
 
         const isPasswordCorrect = await bcrypt.compare(
             password,
             userInfo.password
         );
 
-        if (!isPasswordCorrect)
-            return res.status(404).json({ message: 'Invalid Credentials' });
+        if (!isPasswordCorrect) throwError('Invalid Credentials', 404);
 
         // If correct credentials_ auth user
 
@@ -80,10 +76,8 @@ const loginUser = async (req, res) => {
                 additionalInfo: userInfo.additionalInfo,
             },
         });
-    } catch (error) {
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+    } catch (err) {
+        handleError(res, err);
     }
 };
 
@@ -94,19 +88,19 @@ const logoutUser = (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-    console.log('entered')
     const { name, bio, additionalInfo } = req.body;
-    if (!name || name.trim().length < 2)
-        return res.status(400).json({
-            message: 'Name is required and must be at least 2 characters.',
-        });
-
     try {
+        if (!name || name.trim().length < 2)
+            throwError(
+                'Name is required and must be at least 2 characters.',
+                400
+            );
+
         const userProfile = await User.findById(req.user.id);
         userProfile.name = name;
         userProfile.bio = bio;
         userProfile.additionalInfo = additionalInfo;
-        
+
         await userProfile.save();
 
         const token = jwt.sign(
@@ -138,9 +132,7 @@ const updateProfile = async (req, res) => {
             },
         });
     } catch (err) {
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 

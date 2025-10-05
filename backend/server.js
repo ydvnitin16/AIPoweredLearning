@@ -1,13 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import connectDB from './configs/mongoConfig.js';
 import userRoute from './routes/userRoute.js';
 import subjectRoute from './routes/subjectRoute.js';
 import topicRoute from './routes/topicRoute.js';
-import GenAI from './configs/gemini.js';
 
 dotenv.config();
 connectDB();

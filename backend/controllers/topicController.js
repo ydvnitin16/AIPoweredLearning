@@ -1,9 +1,12 @@
-import mongoose from 'mongoose';
-import { v2 as cloudinary } from 'cloudinary';
-import Subject from '../models/subjectModel.js';
 import Topic from '../models/topicModel.js';
-import User from '../models/userModel.js';
 import Progress from '../models/progressModel.js';
+import { checkOwnerShip, isValidObjectId } from '../utils/validationUtils.js';
+import { handleError, throwError } from '../utils/helper.js';
+import { requireSubject, requireTopic } from '../services/requireService.js';
+import {
+    attachImagesToOutput,
+    deleteImageFromCloudinary,
+} from '../utils/cloudinaryUtils.js';
 
 const createTopic = async (req, res) => {
     const { subjectId, topic } = req.body;
@@ -13,17 +16,10 @@ const createTopic = async (req, res) => {
         output = JSON.parse(output);
     }
     try {
-        const subject = await Subject.findById(subjectId);
-        if (!subject)
-            return res.status(404).json({ message: 'Subject not found.' });
+        const subject = await requireSubject(subjectId);
 
-        if (subject.createdBy.valueOf() !== req.user.id)
-            return res.status(403).json({
-                message:
-                    "You are not allowed to create topic in other's Subject",
-            });
+        checkOwnerShip(subject.createdBy.valueOf(), req.user.id);
 
-        console.log(subjectId, topic);
         subject.suggestedTopics = subject.suggestedTopics.filter(
             (t) => t !== topic
         );
@@ -47,44 +43,17 @@ const createTopic = async (req, res) => {
             topic: createdTopic,
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
-function attachImagesToOutput(output, files) {
-    let fileIdx = 0;
-    output.content = output.content.map((block) => {
-        if (
-            block.type === 'image' &&
-            block.data?.placeholder &&
-            files[fileIdx]
-        ) {
-            block.data = {
-                url: files[fileIdx].path,
-                publicId: files[fileIdx].filename,
-            };
-            fileIdx++;
-        }
-        return block;
-    });
-    return output;
-}
-
 const getTopicsOfSubject = async (req, res) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid subject ID.' });
-    }
+    const { subjectId } = req.params;
     try {
-        const subject = await Subject.findById(id);
-        if (!subject) {
-            return res.status(404).json({ message: 'Subject not found' });
-        }
+        if (!isValidObjectId(subjectId)) throwError('Invalid subject id', 400);
 
-        const topics = await Topic.find({ subjectId: id });
+        const subject = await requireSubject(subjectId);
+        const topics = await Topic.find({ subjectId: subjectId });
 
         const topicIds = topics.map((t) => t._id);
 
@@ -115,89 +84,53 @@ const getTopicsOfSubject = async (req, res) => {
             topics: topicsWithProgress || [],
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const deleteTopic = async (req, res) => {
     const { id } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid topic ID.' });
-    }
-
     try {
-        const topic = await Topic.findById(id);
-        if (!topic) {
-            return res.status(404).json({ message: 'Topic not found.' });
-        }
+        if (!isValidObjectId(id)) throwError('Invalid topic id', 400);
 
-        const subject = await Subject.findById(topic.subjectId);
-        if (!subject || subject.createdBy.toString() !== req.user.id) {
-            return res.status(403).json({
-                message:
-                    "You are not allowed to delete topic in other's Subject",
-            });
-        }
+        const topic = await requireTopic(id);
+        const subject = await requireSubject(topic.subjectId);
 
-        // --- Delete Cloudinary images if present ---
+        checkOwnerShip(subject.createdBy.toString(), req.user.id);
+
+        // delete cloudinary images
         if (topic.output?.content && Array.isArray(topic.output.content)) {
             for (const block of topic.output.content) {
                 if (block.type === 'image' && block.data?.publicId) {
-                    try {
-                        await cloudinary.uploader.destroy(block.data.publicId);
-                        console.log(`Deleted image: ${block.data.publicId}`);
-                    } catch (err) {
-                        console.error(
-                            `Failed to delete image ${block.data.publicId}:`,
-                            err.message
-                        );
-                    }
+                    await deleteImageFromCloudinary(block.data.publicId);
                 }
             }
         }
 
-        // --- Delete progress records linked to this topic ---
         const progressResult = await Progress.deleteMany({ topicId: id });
 
-        // --- Delete the topic itself ---
         await Topic.deleteOne({ _id: id });
 
         res.status(200).json({
             message: `Topic deleted successfully. Also removed ${progressResult.deletedCount} progress records and related images.`,
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const markAsDone = async (req, res) => {
     const { subjectId, topicId, isDone } = req.body;
 
-    if (typeof isDone !== 'boolean') {
-        return res.status(400).json({ message: 'isDone must be a boolean' });
-    }
-
     try {
-        const subject = await Subject.findById(subjectId);
-        if (!subject) {
-            return res.status(404).json({ message: 'Subject not found' });
+        if (typeof isDone !== 'boolean') {
+            throwError('isDone must be a Boolean', 400);
         }
+        const subject = await requireSubject(subjectId);
+        const topic = await requireTopic(topicId);
 
-        const topic = await Topic.findById(topicId);
-        if (!topic) {
-            return res.status(404).json({ message: 'Topic not found' });
-        }
-        if (topic.subjectId.toString() !== subjectId.toString()) {
-            return res
-                .status(400)
-                .json({ message: 'Topic does not belong to this subject' });
-        }
+        if ((topic.subjectId.toString() !== subjectId.toString()))
+            throwError('Topic not belongs to that subjectId', 403);
 
         const progress = await Progress.findOneAndUpdate(
             {
@@ -213,11 +146,8 @@ const markAsDone = async (req, res) => {
             message: 'Progress updated successfully',
             progress,
         });
-    } catch (error) {
-        console.error(err);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+    } catch (err) {
+        handleError(res, err);
     }
 };
 

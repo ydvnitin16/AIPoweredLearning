@@ -1,19 +1,17 @@
 import Subject from '../models/subjectModel.js';
-import User from '../models/userModel.js';
 import Topic from '../models/topicModel.js';
-import mongoose from 'mongoose';
-import { v2 as cloudinary } from "cloudinary";
-import Progress from '../models/progressModel.js'
+import Progress from '../models/progressModel.js';
+import { checkOwnerShip, isValidObjectId, validateTitle } from '../utils/validationUtils.js';
+import { requireSubject, requireUser } from '../services/requireService.js';
+import { handleError, throwError } from '../utils/helper.js';
+import { deleteImageFromCloudinary } from '../utils/cloudinaryUtils.js';
 
 const createSubject = async (req, res) => {
     const { title } = req.body;
+    const { id } = req.user;
 
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-        return res.status(400).json({ message: 'Please Give the Title' });
-    }
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        const user = await requireUser(id);
 
         const subject = await Subject({
             title: title.trim(),
@@ -30,32 +28,21 @@ const createSubject = async (req, res) => {
             subject: createdSubject,
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const updateSubject = async (req, res) => {
-    const { title, subjectId } = req.body;
-    if (!title || typeof title !== 'string' || title.trim() === '') {
-        return res.status(400).json({ message: 'Please Give the Title' });
-    }
+    const { subjectId } = req.body;
+    const { id } = req.user;
+
     try {
-        const user = await User.findById(req.user.id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!isValidObjectId(subjectId)) throwError('Invalid subject id', 400);
 
-        const subject = await Subject.findById(subjectId);
+        const user = await requireUser(id);
+        const subject = await requireSubject(subjectId);
 
-        if (!subject)
-            return res.status(404).json({ message: 'Subject not found' });
-
-        if (user._id.valueOf() !== subject.createdBy.valueOf()) {
-            return res.status(403).json({
-                message: "You can't generate suggestion in other's subject",
-            });
-        }
+        checkOwnerShip(user._id.valueOf(), subject.createdBy.valueOf())
 
         subject.suggestedTopics = req.suggestedTopics;
         await subject.save();
@@ -65,20 +52,14 @@ const updateSubject = async (req, res) => {
             subject: subject,
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const getImportedSubjects = async (req, res) => {
     const { id } = req.user;
     try {
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        const user = await requireUser(id);
 
         const importedSubjects = await Subject.find({
             _id: { $in: user.importedSubjects },
@@ -93,10 +74,7 @@ const getImportedSubjects = async (req, res) => {
             importedSubjects: importedSubjects || [],
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
@@ -161,10 +139,7 @@ const getSubjects = async (req, res) => {
             subjects: subjectWithProgress || [],
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err)
     }
 };
 
@@ -181,31 +156,23 @@ const getPublicSubjects = async (req, res) => {
             publicSubjects: publicSubjects || [],
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err)
     }
 };
 
 const updateIsPublicStatus = async (req, res) => {
     const { subjectId, isPublic } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-        return res.status(400).json({ message: 'Invalid subject ID.' });
-    }
-    if (typeof isPublic !== 'boolean') {
-        return res.status(400).json({ message: 'isPublic must be a boolean.' });
-    }
     try {
-        const subject = await Subject.findById(subjectId);
-        if (!subject) {
-            return res.status(404).json({ message: 'Subject not found' });
-        }
+        if (!isValidObjectId(subjectId)) throwError('Invalid subject id', 400);
+
+        if (typeof isPublic !== 'boolean')
+            throwError('isPublic must be Boolean', 400);
+
+        const subject = await requireSubject(subjectId);
+
         if (subject.createdBy.valueOf() !== req.user.id) {
-            return res.status(403).json({
-                message: 'You are not allowed to update this subject',
-            });
+            throwError('You are not allowed to update this subject', 403);
         }
         subject.isPublic = isPublic;
         const updatedSubject = await subject.save();
@@ -214,37 +181,26 @@ const updateIsPublicStatus = async (req, res) => {
             subject: updatedSubject,
         });
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const importSubject = async (req, res) => {
     const { id } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: 'Invalid subject ID.' });
-    }
+
     try {
-        const originalSubject = await Subject.findById(id);
-        if (!originalSubject) {
-            return res.status(404).json({ message: 'Subject not found' });
+        if (!isValidObjectId(id)) {
+            throwError('Invalid subject id', 400);
         }
-        if (originalSubject.createdBy.valueOf() === req.user.id) {
-            return res
-                .status(403)
-                .json({ message: `You can't import your own document` });
-        }
-        const user = await User.findById(req.user.id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-        if (user.importedSubjects.includes(originalSubject._id)) {
-            return res
-                .status(400)
-                .json({ message: 'Subject already imported.' });
-        }
+        const originalSubject = await requireSubject(id);
+        const user = await requireUser(req.user.id); // check is user exists
+
+        if (originalSubject.createdBy.valueOf() === req.user.id)
+            throwError(`You can't import your own document`, 403);
+
+        if (user.importedSubjects.includes(originalSubject._id))
+            throwError('Subject already imported.', 400);
+
         user.importedSubjects.push(originalSubject._id);
 
         await user.save();
@@ -253,115 +209,85 @@ const importSubject = async (req, res) => {
             importedSubjectId: originalSubject._id,
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: 'Server error. Please try again later.',
-        });
+        handleError(res, err);
     }
 };
 
 const deleteSubject = async (req, res) => {
     const { subjectId } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-        return res.status(400).json({ message: "Invalid subject ID." });
-    }
-
     try {
-        const subject = await Subject.findById(subjectId);
+        if (!isValidObjectId(subjectId)) throwError('Invalid subject id');
 
-        if (!subject) {
-            return res.status(404).json({ message: "Subject not found" });
-        }
-
-        if (subject.createdBy.toString() !== req.user.id) {
-            return res.status(403).json({
-                message: "You not allowed to delete this subject",
-            });
-        }
+        const subject = await requireSubject(subjectId);
+        const user = await requireUser(req.user.id);
+        console.log(subject, user)
+        checkOwnerShip(subject.createdBy.toString(), req.user.id)
 
         // --- Remove subject reference from user ---
-        const user = await User.findById(req.user.id);
         user.subjects = user.subjects.filter(
             (id) => id.toString() !== subjectId
         );
         await user.save();
 
-        // --- Find all topics of this subject ---
+        // get all topics of that subject to delete
         const topics = await Topic.find({ subjectId });
         const topicIds = topics.map((t) => t._id);
 
-        // --- Delete all Cloudinary images from each topic ---
+        // Delete cloudinary images
         for (const topic of topics) {
             if (topic.output?.content && Array.isArray(topic.output.content)) {
                 for (const block of topic.output.content) {
-                    if (block.type === "image" && block.data?.publicId) {
-                        try {
-                            await cloudinary.uploader.destroy(
-                                block.data.publicId
-                            );
-                            console.log(
-                                `Deleted image: ${block.data.publicId}`
-                            );
-                        } catch (err) {
-                            console.error(
-                                `Failed to delete image ${block.data.publicId}:`,
-                                err.message
-                            );
-                        }
+                    if (block.type === 'image' && block.data?.publicId) {
+                        await deleteImageFromCloudinary(block.data.publicId)
                     }
                 }
             }
         }
-
-        // --- Delete progress of all topics under this subject ---
+        // delete progress of that subject
         const progressResult = await Progress.deleteMany({
             subjectId,
             topicId: { $in: topicIds },
         });
 
-        // --- Delete topics and subject ---
+        // delete subject and its topics
         const topicResult = await Topic.deleteMany({ subjectId });
         await Subject.findByIdAndDelete(subjectId);
 
         res.status(200).json({
-            message: `Subject deleted. ${topicResult.deletedCount ? `${topicResult.deletedCount} topics,` : ''} ${progressResult.deletedCount ? `${progressResult.deletedCount} progress records` : ''}, related images removed successfully.`,
+            message: `Subject deleted. ${
+                topicResult.deletedCount
+                    ? `${topicResult.deletedCount} topics,`
+                    : ''
+            } ${
+                progressResult.deletedCount
+                    ? `${progressResult.deletedCount} progress records,`
+                    : ''
+            } related images removed successfully.`,
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: "Server error. Please try again later.",
-        });
+        handleError(res, err);
     }
 };
 
 const deleteImportedSubject = async (req, res) => {
     const { subjectId } = req.body;
-    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
-        return res.status(400).json({ message: "Invalid subject ID." });
-    }
-
     try {
-        const subject = await Subject.findById(subjectId);
+        if (!isValidObjectId(subjectId)) throwError('Invalid subject id');
+  
+        const user = await requireUser(req.user.id);
 
-        if (!subject) {
-            return res.status(404).json({ message: "Subject not found" });
-        }
-
-        const user = await User.findById(req.user.id);
-        user.importedSubjects = user.importedSubjects.filter(s => s.toString() !== subjectId);
-        await user.save()
-
+        user.importedSubjects = user.importedSubjects.filter(
+            (s) => s.toString() !== subjectId
+        );
+        await user.save();
 
         res.status(200).json({
             message: `Subject deleted.`,
         });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            message: "Server error. Please try again later.",
-        });
+        handleError(res, err);
     }
-}
+};
 
 export {
     createSubject,
@@ -372,5 +298,5 @@ export {
     getImportedSubjects,
     deleteSubject,
     updateSubject,
-    deleteImportedSubject
+    deleteImportedSubject,
 };

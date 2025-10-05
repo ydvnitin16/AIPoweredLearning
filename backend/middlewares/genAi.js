@@ -3,36 +3,45 @@ import {
     buildPrompt,
     createUserConfig,
     parseJson,
-} from '../helper/aiHelpers.js';
+} from '../utils/aiUtils.js';
+import { handleError, throwError } from '../utils/helper.js';
+import { validateTitle } from '../utils/validationUtils.js';
 
 const generateTopicExp = async (req, res, next) => {
     const { topic } = req.body;
-
-    const userConfig = createUserConfig(req.body, req.user);
-    const prompt = buildPrompt(userConfig);
-
     try {
+        if (!validateTitle(topic)) {
+            throwError('Please enter topic');
+        }
+
+        const userConfig = createUserConfig(req.body, req.user);
+        const prompt = buildPrompt(userConfig);
+
         const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
         const jsonOutput = parseJson(output);
         req.output = jsonOutput;
-        console.log("JSON Output: ",jsonOutput);
+        console.log('JSON Output: ', jsonOutput);
         next();
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Failed to generate topic explanation.',
-        });
+        handleError(res, err)
     }
 };
 
 const getSuggestedTopics = async (req, res, next) => {
     const { title, topics } = req.body;
+
+    if (!validateTitle(title)) {
+        return res.status(400).json({ message: 'Please Give the Title' });
+    }
+
     const prompt = `
     You are a curriculum assistant.
-        Given a ${title} subject ${topics ? `${topics} these topics are already done` : ''}, generate 10 highly relevant and logically ordered topics that a learner should study next. 
+        Given a ${title} subject ${
+        topics ? `${topics} these topics are already done` : ''
+    }, generate 10 highly relevant and logically ordered topics that a learner should study next. 
         - Input is a SUBJECT return subtopics covering the subject step by step.
         - Format your output strictly as a valid JSON array of strings:
         ["topic1", "topic2", "topic3", ...]
@@ -44,15 +53,13 @@ const getSuggestedTopics = async (req, res, next) => {
         console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
-        const jsonOutput = parseJson(output)
-        console.log("JSON Output: ",jsonOutput);
+        const jsonOutput = parseJson(output);
+        console.log('JSON Output: ', jsonOutput);
         req.suggestedTopics = jsonOutput;
-        next();
     } catch (err) {
-        console.log(err.message);
-        res.status(500).json({
-            message: 'Failed to generate subject suggestions.',
-        });
+        handleError(res, err);
+    } finally {
+        next();
     }
 };
 

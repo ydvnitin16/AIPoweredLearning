@@ -1,4 +1,3 @@
-// User Sign-up/in -> Validate fields
 const validateUser = (type = 'register') => {
     return (req, res, next) => {
         const { name, email, password, terms } = req.body;
