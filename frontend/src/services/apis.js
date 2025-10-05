@@ -83,7 +83,7 @@ async function importSubject(data) {
 }
 
 async function generateTopic(data) {
-    const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/topics`, {
+    const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/generate-topic`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
