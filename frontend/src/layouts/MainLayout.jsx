@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import Navbar from '../components/common/Navbar';
 import UpdateProfileModal from '../components/form/UpdateProfileModal';
 import ConfirmModal from '../components/common/ConfirmModal';
-import { logoutUser } from '../services/apis';
+import { deleteRequest } from '../services/apis';
 
 const MainLayout = () => {
     const queryClient = useQueryClient();
@@ -26,7 +26,7 @@ const MainLayout = () => {
 
     const handleLogout = async () => {
         try {
-            const data = await logoutUser();
+            const data = await deleteRequest(`${import.meta.env.VITE_SERVER_URL}/logout`);
             clearUserStore();
             toast.success(data.message);
             queryClient.invalidateQueries({ queryKey: ['subjects'] });

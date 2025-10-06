@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { publicToggle } from '../services/apis';
+import { putRequest } from '../services/apis';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const usePublicToggle = () => {
@@ -14,7 +14,7 @@ export const usePublicToggle = () => {
             subjectId: id,
         };
         try {
-            const data = await publicToggle(formatted);
+            const data = await putRequest( `${import.meta.env.VITE_SERVER_URL}/subjects/public`, formatted);
             queryClient.invalidateQueries({ queryKey: ['subjects'] });
             toast.success(data.message);
         } catch (err) {

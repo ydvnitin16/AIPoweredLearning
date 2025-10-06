@@ -89,6 +89,7 @@ const getTopicsOfSubject = async (req, res) => {
 };
 
 const deleteTopic = async (req, res) => {
+    console.log(req.body);
     const { id } = req.body;
     try {
         if (!isValidObjectId(id)) throwError('Invalid topic id', 400);

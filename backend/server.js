@@ -24,6 +24,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', userRoute);
 app.use('/', subjectRoute);
 app.use('/', topicRoute);
+app.use((req, res, next) => {
+    res.status(404).json({ message: 'Route not found' });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

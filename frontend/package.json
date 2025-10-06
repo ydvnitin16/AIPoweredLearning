@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "katex": "^0.16.22",
+    "keen-slider": "^6.8.6",
     "lucide-react": "^0.540.0",
     "mermaid": "^10.9.4",
     "react": "^19.1.1",

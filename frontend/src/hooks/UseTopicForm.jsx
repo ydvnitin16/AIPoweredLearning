@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic';
 import toast from 'react-hot-toast';
-import { generateTopic } from '../services/apis';
+import { postRequest } from '../services/apis';
 import { useFormStore } from '../stores/UseTopicFormStore';
 
 const schema = yup.object({
@@ -62,7 +62,13 @@ export const useTopicForm = () => {
 
     const queryClient = useQueryClient();
     const mutation = useMutation({
-        mutationFn: generateTopic,
+        mutationFn: async (form) => {
+            const data = await postRequest(
+                `${import.meta.env.VITE_SERVER_URL}/generate-topic`,
+                form
+            );
+            return data
+        },
         onSuccess: (data) => {
             queryClient.invalidateQueries({
                 queryKey: ['topics', selectedSubject?._id],

@@ -72,7 +72,7 @@ Follow this example schema strictly:
 Rules:
 - Explanations: clear, structured, ${config.userProfile.preference || ''}.
 - Content: supported types ['text', 'code', 'formula', 'viz', 'reactflow', 'image', 'table']
-- Code: always include inline comments; heading must specify language , "extension" this include the extension of the language (eg. jsx, cpp...)
+- Code: always include inline comments; heading must specify language , add field "extension" this include the extension of the language (eg. jsx, cpp...)
 - image: use when a visual real-world representation, conceptual diagram, or illustration would teach better than text or Mermaid. 'data' must be a direct valid image URL from a reliable source.
 - Viz (Graphviz):
   - Use when rendering complex graph structures or DAGs.

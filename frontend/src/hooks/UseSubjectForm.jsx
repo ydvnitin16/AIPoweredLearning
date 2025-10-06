@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { createSubject } from '../services/apis';
+import { postRequest } from '../services/apis';
 import toast from 'react-hot-toast';
 
 const schema = yup.object({
@@ -22,14 +22,17 @@ export const useSubjectForm = () => {
     });
 
     const mutation = useMutation({
-        mutationFn: createSubject,
+        mutationFn: async (form) => {
+            const data = await postRequest(`${import.meta.env.VITE_SERVER_URL}/subjects`, form);
+            return data
+        },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['subjects'] });
-            toast.success(data.message)
+            toast.success(data.message);
         },
         onError: (data) => {
-            toast.error(data.message)
-        }
+            toast.error(data.message);
+        },
     });
 
     return { form, mutation };

@@ -1,4 +1,4 @@
-import { updateProfile } from '../services/apis';
+import { putRequest } from '../services/apis';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,7 +27,7 @@ export const useUpdateProfile = () => {
 
     const onSubmit = async (data) => {
         try {
-            const resData = await updateProfile(data);
+            const resData = await putRequest(`${import.meta.env.VITE_SERVER_URL}/update-profile`, data);
             console.log(resData)
             setUserStore(resData.user);
             toast.success(resData.message);

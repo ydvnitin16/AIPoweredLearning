@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { generateSuggestions } from '../services/apis';
+import { putRequest } from '../services/apis';
 import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic';
 import toast from 'react-hot-toast';
 
@@ -13,7 +13,7 @@ export const useGenerateSuggestions = () => {
         try {
             let { topics, subjectId, title } = subjectInfo;
             topics = topics.map((t) => t.topic);
-            const data = await generateSuggestions({
+            const data = await putRequest(`${import.meta.env.VITE_SERVER_URL}/subjects/suggestions` ,{
                 topics,
                 subjectId,
                 title,

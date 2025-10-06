@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { deleteData, fetchData } from '../services/apis';
+import { deleteRequest, getRequest } from '../services/apis';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
@@ -7,7 +7,7 @@ export const useSubjects = () => {
     return useQuery({
         queryKey: ['subjects'],
         queryFn: async () => {
-            const data = await fetchData(
+            const data = await getRequest(
                 `${import.meta.env.VITE_SERVER_URL}/subjects`
             );
             return data.subjects;
@@ -22,7 +22,7 @@ export const useDeleteSubject = () => {
 
     return useMutation({
         mutationFn: async (subjectId) => {
-            const data = await deleteData(`${import.meta.env.VITE_SERVER_URL}/subjects`, {
+            const data = await deleteRequest(`${import.meta.env.VITE_SERVER_URL}/subjects`, {
                 subjectId,
             });
             console.log(data)

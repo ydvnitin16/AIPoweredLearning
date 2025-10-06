@@ -93,7 +93,7 @@ const RenderSubjectList = ({
                     <p className="text-sm text-white/90">
                         Progress: {subj.progress}%
                     </p>
-                    {userStore.id === subj?.createdBy && (
+                    {(
                         <button
                             className="absolute top-3 right-3 opacity-0 group-hover:opacity-100  transition-opacity duration-200 p-1 backdrop-blur-3xl bg-black/50 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700 cursor-pointer"
                             onClick={(e) => {
