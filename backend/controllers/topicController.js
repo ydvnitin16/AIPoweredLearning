@@ -47,6 +47,25 @@ const createTopic = async (req, res) => {
     }
 };
 
+const updateTopicNotes = async (req, res) => {
+    const { topicId, notes } = req.body;
+    try {
+        if (!isValidObjectId(topicId)) throwError('Invalid topic id', 400);
+
+        const topic = await requireTopic(topicId);
+        const subject = await requireSubject(topic.subjectId);
+
+        checkOwnerShip(subject.createdBy.toString(), req.user.id);
+
+        topic.notes = typeof notes === 'string' ? notes : topic.notes;
+        const saved = await topic.save();
+
+        res.status(200).json({ message: 'Notes updated', topic: saved });
+    } catch (err) {
+        handleError(res, err);
+    }
+};
+
 const getTopicsOfSubject = async (req, res) => {
     const { subjectId } = req.params;
     try {
@@ -151,4 +170,4 @@ const markAsDone = async (req, res) => {
     }
 };
 
-export { createTopic, getTopicsOfSubject, deleteTopic, markAsDone };
+export { createTopic, updateTopicNotes, getTopicsOfSubject, deleteTopic, markAsDone };

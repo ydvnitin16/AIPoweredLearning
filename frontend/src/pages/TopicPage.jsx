@@ -8,7 +8,8 @@ import RenderFlashcard from '../components/topics/RenderFlashcard.jsx';
 import QuizQuestion from '../components/topics/QuizQuestion.jsx';
 import PracticeQuestion from '../components/topics/PracticeQuestion.jsx';
 import { useMarkAsDone } from '../hooks/UseMarkAsDone.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import useNotes from '../hooks/UseNotes.jsx';
 
 export default function TopicPage() {
     const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function TopicPage() {
     const quizzes = selectedTopic?.output?.quizzes || [];
     const revision = selectedTopic?.output?.revision || null;
     const practiceQuestions = selectedTopic?.output?.practiceQuestions || [];
+    const notes = selectedTopic?.notes || ''
 
     const { markAsDone, loading, error } = useMarkAsDone();
     const [isDone, setIsDone] = useState(selectedTopic?.isDone || false);
@@ -40,6 +42,17 @@ export default function TopicPage() {
             setIsDone(!checked);
         }
     };
+
+    const { mutation } = useNotes();
+    const notesLoading = mutation?.isLoading || false;
+
+    // editable notes state
+    const [notesText, setNotesText] = useState(notes);
+
+    useEffect(() => {
+        setNotesText(notes);
+    }, [notes]);
+
 
     return (
         <div className="min-h-screen max-full bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 transition-colors duration-200">
@@ -172,15 +185,30 @@ export default function TopicPage() {
                                     📝 Self Notes
                                 </h3>
                                 <textarea
+                                    value={notesText}
+                                    onChange={(e) => setNotesText(e.target.value)}
                                     placeholder="Write your own notes..."
                                     className="w-full p-3 rounded-lg bg-zinc-100 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 resize-y min-h-[120px]"
                                     rows={5}
                                 />
                                 <div className="mt-3 flex gap-2">
-                                    <button className="flex-1 bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600">
-                                        Save Notes
+                                    <button
+                                        className="flex-1 bg-indigo-500 text-white py-2 rounded-lg hover:bg-indigo-600 disabled:opacity-60"
+                                        onClick={() => {
+                                            if (!selectedTopic?._id) return;
+                                            mutation.mutate({
+                                                topicId: selectedTopic._id,
+                                                notes: notesText,
+                                            });
+                                        }}
+                                        disabled={notesLoading}
+                                    >
+                                        {notesLoading ? 'Saving...' : 'Save Notes'}
                                     </button>
-                                    <button className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700">
+                                    <button
+                                        className="px-4 py-2 rounded-lg bg-zinc-200 dark:bg-zinc-700"
+                                        onClick={() => setNotesText('')}
+                                    >
                                         Clear
                                     </button>
                                 </div>
