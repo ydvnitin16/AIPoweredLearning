@@ -30,8 +30,8 @@ export default function Footer() {
           <div className="flex gap-4">
             <a href="#" className="hover:text-white"><Facebook size={20} /></a>
             <a href="#" className="hover:text-white"><Twitter size={20} /></a>
-            <a href="#" className="hover:text-white"><Github size={20} /></a>
-            <a href="mailto:support@smartstudyai.com" className="hover:text-white">
+            <a href="https://github.com/ydvnitin16/SmartStudyAI" className="hover:text-white"><Github size={20} /></a>
+            <a href="mailto:ydvnitin16@gmail.com" className="hover:text-white">
               <Mail size={20} />
             </a>
           </div>

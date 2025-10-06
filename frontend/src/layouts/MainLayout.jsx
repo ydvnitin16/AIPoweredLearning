@@ -17,7 +17,7 @@ const MainLayout = () => {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState();
     useEffect(() => {
-        if (isAuthExpired()) {
+        if (isAuthExpired() && userStore) {
             toast('Please Login!');
             clearUserStore();
             navigate('/login');

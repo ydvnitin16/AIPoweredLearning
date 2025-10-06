@@ -4,8 +4,10 @@ import hero from "../../assets/hero.png";
 import heroSm from "../../assets/hero2.png";
 import Button from "../common/Button.jsx";
 import { useNavigate } from "react-router-dom";
+import { UseAuthStore } from "../../stores/UseAuthStore.jsx";
 
 export default function HeroSection() {
+  const userStore = UseAuthStore(s => s.userStore)
   const navigate = useNavigate();
 
   return (
@@ -37,7 +39,7 @@ export default function HeroSection() {
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => userStore ? navigate("/dashboard") : navigate('/login')}
               name="Start Free"
               bgColor="#facc15"
               color="#0f172a"

@@ -71,8 +71,8 @@ const Navbar = ({ user, setIsProfileModalOpen, setIsLogoutModalOpen }) => {
                     </div>
                 )}
             </div> : <button
-                    onClick={() => navigate('/get-started')}
-                    className="min-w-[100px] h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+                    onClick={() => navigate('/login')}
+                    className="min-w-[100px] h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition cursor-pointer"
                 >
                     Get Started
                 </button>}
