@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Trash } from 'lucide-react';
 import ContentRenderer from '../topics/ContentRenderer';
 
 export default function ContentEditor({ content, setContent }) {
@@ -46,6 +46,12 @@ export default function ContentEditor({ content, setContent }) {
         }
 
         setContent([...content, newBlock]);
+    };
+
+    const deleteBlock = (idx) => {
+        let updated = [...content];
+        updated = updated.filter((block, i) => i !== idx);
+        setContent([...updated]);
     };
 
     const updateBlock = (idx, key, value) => {
@@ -129,6 +135,9 @@ export default function ContentEditor({ content, setContent }) {
                             key={idx}
                             className="p-4 rounded-xl border border-zinc-300 bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-700 shadow-sm space-y-3"
                         >
+                            <div className="flex justify-end text-red-700 cursor-pointer">
+                                <Trash onClick={() => deleteBlock(idx)} />
+                            </div>
                             {/* Heading */}
                             <input
                                 type="text"

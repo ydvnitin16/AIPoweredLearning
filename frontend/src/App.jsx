@@ -17,6 +17,7 @@ import RevisionPage from './pages/RevisionPage.jsx';
 import CreateTopicPage from './pages/CreateTopicPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 import ErrorBoundary from './components/common/ErrorBoundary.jsx';
+import { ProtectedUserRoutes } from './components/common/ProtectedRoutes.jsx';
 
 function App() {
     const router = createBrowserRouter(
@@ -33,16 +34,48 @@ function App() {
                     }
                 >
                     <Route index element={<LandingPage />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="subject" element={<SubjectPage />} />
-                    <Route path="topic" element={<TopicPage />} />
-                    <Route path="revision" element={<RevisionPage />} />
+                    <Route
+                        path="dashboard"
+                        element={
+                            <ProtectedUserRoutes>
+                                <Dashboard />
+                            </ProtectedUserRoutes>
+                        }
+                    />
+                    <Route
+                        path="subject"
+                        element={
+                            <ProtectedUserRoutes>
+                                <SubjectPage />
+                            </ProtectedUserRoutes>
+                        }
+                    />
+                    <Route
+                        path="topic"
+                        element={
+                            <ProtectedUserRoutes>
+                                <TopicPage />
+                            </ProtectedUserRoutes>
+                        }
+                    />
+                    <Route
+                        path="revision"
+                        element={
+                            <ProtectedUserRoutes>
+                                <RevisionPage />
+                            </ProtectedUserRoutes>
+                        }
+                    />
                     <Route
                         path="create-topic/:subjectId"
-                        element={<CreateTopicPage />}
+                        element={
+                            <ProtectedUserRoutes>
+                                <CreateTopicPage />
+                            </ProtectedUserRoutes>
+                        }
                     />
-                    <Route path="*" element={<NotFound />} />
                 </Route>
+                <Route path="*" element={<NotFound />} />
             </>
         )
     );
