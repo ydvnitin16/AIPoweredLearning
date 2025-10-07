@@ -24,6 +24,10 @@ const MainLayout = () => {
         }
     }, [isAuthExpired, clearUserStore, navigate]);
 
+    useEffect(() => {
+        toast('Please wait backend may take time to boot upto 1m')
+    }, [])
+
     const handleLogout = async () => {
         try {
             const data = await deleteRequest(`${import.meta.env.VITE_SERVER_URL}/logout`);

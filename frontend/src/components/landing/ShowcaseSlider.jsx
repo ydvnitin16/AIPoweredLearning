@@ -72,32 +72,28 @@ export default function ShowcaseSlider() {
   });
 
   return (
-    <section className="relative w-full h-screen bg-gray-900">
-      <div ref={sliderRef} className="keen-slider h-full">
-        {showcaseItems.map((item, index) => (
-          <div key={index} className="keen-slider__slide relative h-screen w-full">
-            {/* Background Image */}
-            <img
-              src={item.image}
-              alt={item.title}
-              className="absolute inset-0 w-full h-full object-cover brightness-75"
-            />
-
-            {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-
-            {/* Text Overlay */}
-            <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 text-center px-6 md:px-0 max-w-3xl">
-              <h2 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg mb-4">
-                {item.title}
-              </h2>
-              <p className="text-lg md:text-xl text-gray-200 leading-relaxed drop-shadow-md">
-                {item.description}
-              </p>
-            </div>
-          </div>
-        ))}
+    <section className="relative w-full h-[70vh] sm:h-[80vh] xl:h-screen bg-gray-900">
+  <div ref={sliderRef} className="keen-slider h-full">
+    {showcaseItems.map((item, index) => (
+      <div key={index} className="keen-slider__slide relative h-full w-full">
+        <img
+          src={item.image}
+          alt={item.title}
+          className="absolute inset-0 w-full h-full object-contain brightness-75"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-center px-6 md:px-0 max-w-3xl">
+          <h2 className="text-3xl md:text-6xl font-bold text-white drop-shadow-lg mb-4">
+            {item.title}
+          </h2>
+          <p className="text-base md:text-xl text-gray-200 leading-relaxed drop-shadow-md">
+            {item.description}
+          </p>
+        </div>
       </div>
-    </section>
+    ))}
+  </div>
+</section>
+
   );
 }
