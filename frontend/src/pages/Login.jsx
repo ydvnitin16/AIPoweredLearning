@@ -38,8 +38,6 @@ const Login = () => {
     });
 
     const onSubmit = async (data) => {
-        console.log('Form Data:', data);
-
         try {
             setLoading(true);
             const res = await authUser('login', data);

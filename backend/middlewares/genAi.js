@@ -18,12 +18,10 @@ const generateTopicExp = async (req, res, next) => {
         const prompt = buildPrompt(userConfig);
 
         const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
         const jsonOutput = parseJson(output);
         req.output = jsonOutput;
-        console.log('JSON Output: ', jsonOutput);
         next();
     } catch (err) {
         handleError(res, err)
@@ -50,11 +48,9 @@ const getSuggestedTopics = async (req, res, next) => {
         `;
     try {
         const model = GenAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        console.log('genAi...');
         const result = await model.generateContent(prompt);
         const output = result.response.text();
         const jsonOutput = parseJson(output);
-        console.log('JSON Output: ', jsonOutput);
         req.suggestedTopics = jsonOutput;
     } catch (err) {
         handleError(res, err);

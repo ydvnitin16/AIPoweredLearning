@@ -100,7 +100,6 @@ function parseJson(output) {
     try {
         return JSON.parse(cleaned);
     } catch (err) {
-        console.log('Failed to parse JSON: ', cleaned);
         throw new Error('Invalid JSON format.');
     }
 }

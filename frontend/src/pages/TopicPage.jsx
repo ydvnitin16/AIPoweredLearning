@@ -2,14 +2,17 @@ import { UseSelectedSubjectTopic } from '../stores/UseSelectedSubjectTopic.jsx';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import ContentRenderer from '../components/topics/ContentRenderer.jsx';
 import { UseAuthStore } from '../stores/UseAuthStore.jsx';
-import RenderFlashcard from '../components/topics/RenderFlashcard.jsx';
-import QuizQuestion from '../components/topics/QuizQuestion.jsx';
-import PracticeQuestion from '../components/topics/PracticeQuestion.jsx';
 import { useMarkAsDone } from '../hooks/UseMarkAsDone.jsx';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import useNotes from '../hooks/UseNotes.jsx';
+import DynamicLoader from '../components/common/DynamicLoader.jsx';
+
+// Lazy load topic components that are conditionally rendered
+const ContentRenderer = lazy(() => import('../components/topics/ContentRenderer.jsx'));
+const RenderFlashcard = lazy(() => import('../components/topics/RenderFlashcard.jsx'));
+const QuizQuestion = lazy(() => import('../components/topics/QuizQuestion.jsx'));
+const PracticeQuestion = lazy(() => import('../components/topics/PracticeQuestion.jsx'));
 
 export default function TopicPage() {
     const navigate = useNavigate();
@@ -83,7 +86,7 @@ export default function TopicPage() {
             <div className="w-full">
                 <main className="max-w-screen mx-auto px-4 sm:px-6 grid gap-4 sm:gap-6 lg:grid-cols-3 py-4">
                     {/* Left / Main column (stacked on small, wide on lg) */}
-                    <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                    <div className="lg:col-span-2 space-y-4 sm:space-y-6 overflow-hidden">
                         {contentArr.length === 0 && (
                             <section className="bg-white dark:bg-zinc-900 p-4 sm:p-6 rounded-xl shadow-md">
                                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -94,11 +97,12 @@ export default function TopicPage() {
 
                         {contentArr.map((obj, idx) => {
                             return (
-                                <ContentRenderer
-                                    key={idx}
-                                    obj={obj}
-                                    idx={idx}
-                                />
+                                <Suspense key={idx} fallback={<DynamicLoader variant="block" count={1} />}>
+                                    <ContentRenderer
+                                        obj={obj}
+                                        idx={idx}
+                                    />
+                                </Suspense>
                             );
                         })}
 
@@ -117,7 +121,9 @@ export default function TopicPage() {
                         </section>
 
                         {/* Flashcards */}
-                        <RenderFlashcard flashcards={flashcards} />
+                        <Suspense fallback={<DynamicLoader variant="block" count={1} />}>
+                            <RenderFlashcard flashcards={flashcards} />
+                        </Suspense>
 
                         {/* Quiz */}
                         {quizzes?.length > 0 && (
@@ -132,7 +138,9 @@ export default function TopicPage() {
                                         </p>
                                     )}
                                     {quizzes?.map((q, i) => (
-                                        <QuizQuestion key={i} q={q} i={i} />
+                                        <Suspense key={i} fallback={<DynamicLoader variant="block" count={1} />}>
+                                            <QuizQuestion q={q} i={i} />
+                                        </Suspense>
                                     ))}
                                 </div>
                             </section>
@@ -145,12 +153,13 @@ export default function TopicPage() {
 
                                 <div className="grid gap-4">
                                     {practiceQuestions.map((q, idx) => (
-                                        <PracticeQuestion
-                                            key={idx}
-                                            index={idx + 1}
-                                            question={q.question}
-                                            answer={q.answer}
-                                        />
+                                        <Suspense key={idx} fallback={<DynamicLoader variant="block" count={1} />}>
+                                            <PracticeQuestion
+                                                index={idx + 1}
+                                                question={q.question}
+                                                answer={q.answer}
+                                            />
+                                        </Suspense>
                                     ))}
                                 </div>
                             </section>

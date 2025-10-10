@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic.jsx';
 import { getColorFromLetter } from '../../services/utils.js';
-import CardLoading from '../common/CardLoading.jsx';
+import DynamicLoader from '../common/DynamicLoader.jsx';
 import { Trash2 } from 'lucide-react';
 import { UseAuthStore } from '../../stores/UseAuthStore.jsx';
 
@@ -17,32 +17,14 @@ const RenderSubjectList = ({
         (state) => state.setSelectedSubject
     );
     const userStore = UseAuthStore((state) => state.userStore);
-    console.log(userStore);
     const { data: subjects, isLoading, isError } = subjectHook();
 
     if (!subjects?.length && loadingQueue > 0) {
-        return <CardLoading msg={msg} />;
+        return <DynamicLoader variant="card" msg={msg} count={3} />;
     }
 
     if (isLoading) {
-        return (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4">
-                {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                    <div
-                        key={index}
-                        className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 
-                        rounded-2xl p-6 shadow-sm hover:shadow-md transition 
-                        group relative cursor-wait animate-pulse"
-                    >
-                        <div className="h-5 w-2/3 bg-zinc-200 dark:bg-zinc-700 rounded-lg mb-3"></div>
-                        <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden mb-4">
-                            <div className="h-full bg-zinc-200 dark:bg-zinc-700 rounded-full w-1/2"></div>
-                        </div>
-                        <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded w-1/3"></div>
-                    </div>
-                ))}
-            </div>
-        );
+        return <DynamicLoader variant="card" count={6} />;
     }
 
     if (isError) {
@@ -106,7 +88,7 @@ const RenderSubjectList = ({
                     )}
                 </div>
             ))}
-            {loadingQueue > 0 && <CardLoading msg={msg} />}
+            {loadingQueue > 0 && <DynamicLoader variant="card" msg={msg} count={1} />}
         </div>
     );
 };

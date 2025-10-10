@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { UseAuthStore } from '../stores/UseAuthStore';
 import toast from 'react-hot-toast';
 import Navbar from '../components/common/Navbar';
-import UpdateProfileModal from '../components/form/UpdateProfileModal';
-import ConfirmModal from '../components/common/ConfirmModal';
+import Loading from '../components/common/Loading';
 import { deleteRequest } from '../services/apis';
+
+// Lazy load modal components
+const UpdateProfileModal = lazy(() =>
+    import('../components/form/UpdateProfileModal')
+);
+const ConfirmModal = lazy(() => import('../components/common/ConfirmModal'));
 
 const MainLayout = () => {
     const queryClient = useQueryClient();
@@ -24,13 +29,11 @@ const MainLayout = () => {
         }
     }, [isAuthExpired, clearUserStore, navigate]);
 
-    useEffect(() => {
-        toast('Please wait backend may take time to boot upto 1m')
-    }, [])
-
     const handleLogout = async () => {
         try {
-            const data = await deleteRequest(`${import.meta.env.VITE_SERVER_URL}/logout`);
+            const data = await deleteRequest(
+                `${import.meta.env.VITE_SERVER_URL}/logout`
+            );
             clearUserStore();
             toast.success(data.message);
             queryClient.invalidateQueries({ queryKey: ['subjects'] });
@@ -40,20 +43,40 @@ const MainLayout = () => {
         }
     };
 
+    useEffect(() => {
+        const bootServer = async () => {
+            try {
+                toast('Starting backend...');
+                const res = await fetch(
+                    `${import.meta.env.VITE_SERVER_URL}/subjects`
+                );
+                toast.success('Backend started successfully.');
+            } catch (error) {
+                toast.error('Backend boot failed.');
+            }
+        };
+
+        bootServer();
+    }, []);
+
     return (
         <>
-            <div className="dark:bg-black">
-                <UpdateProfileModal
-                    isOpen={isProfileModalOpen}
-                    onClose={() => setIsProfileModalOpen(false)}
-                />
-                <ConfirmModal
-                    isOpen={isLogoutModalOpen}
-                    onClose={() => setIsLogoutModalOpen(false)}
-                    onConfirm={handleLogout}
-                    title={'Confirm Logout'}
-                    description={'Do you really want to logout?'}
-                />
+            <div className="dark:bg-black overflow-hidden">
+                <Suspense >
+                    <UpdateProfileModal
+                        isOpen={isProfileModalOpen}
+                        onClose={() => setIsProfileModalOpen(false)}
+                    />
+                </Suspense>
+                <Suspense >
+                    <ConfirmModal
+                        isOpen={isLogoutModalOpen}
+                        onClose={() => setIsLogoutModalOpen(false)}
+                        onConfirm={handleLogout}
+                        title={'Confirm Logout'}
+                        description={'Do you really want to logout?'}
+                    />
+                </Suspense>
                 <Navbar
                     user={userStore}
                     setIsProfileModalOpen={setIsProfileModalOpen}

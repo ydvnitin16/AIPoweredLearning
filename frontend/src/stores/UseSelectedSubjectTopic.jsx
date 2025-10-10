@@ -16,12 +16,6 @@ const UseSelectedSubjectTopic = create((set, get) => ({
                 [subjectId]: topics,
             },
         });
-        console.log(
-            subjectId,
-            topics,
-            'SelectedSubjects_Topics',
-            get().selectedSubjects_Topics
-        );
     },
 
     clearSelectedSubject: () => {

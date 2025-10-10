@@ -220,7 +220,6 @@ const deleteSubject = async (req, res) => {
 
         const subject = await requireSubject(subjectId);
         const user = await requireUser(req.user.id);
-        console.log(subject, user)
         checkOwnerShip(subject.createdBy.toString(), req.user.id)
 
         // --- Remove subject reference from user ---

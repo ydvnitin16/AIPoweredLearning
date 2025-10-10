@@ -25,7 +25,7 @@ export const useGenerateSuggestions = () => {
             setIsGenerating(false);
             toast.success(data.message);
         } catch (err) {
-            console.log(err);
+            // Handle error silently
         }
     };
 

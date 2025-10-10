@@ -50,7 +50,7 @@ export default function TopicPromptFormModal({
             await mutation.mutateAsync({...formatted, topic: data.topic, subject: selectedSubject?.title, subjectId: selectedSubject?._id});
             setFormData(formatted);
         } catch (err) {
-            console.log(err);
+            // Handle error silently
         } finally {
             setTopicGeneratingQueue((prev) => prev - 1);
             

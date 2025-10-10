@@ -28,7 +28,6 @@ export const useUpdateProfile = () => {
     const onSubmit = async (data) => {
         try {
             const resData = await putRequest(`${import.meta.env.VITE_SERVER_URL}/update-profile`, data);
-            console.log(resData)
             setUserStore(resData.user);
             toast.success(resData.message);
         } catch (err) {

@@ -25,11 +25,9 @@ export const useDeleteSubject = () => {
             const data = await deleteRequest(`${import.meta.env.VITE_SERVER_URL}/subjects`, {
                 subjectId,
             });
-            console.log(data)
             return data
         },
         onSuccess: (data) => {
-            console.log(data)
             queryClient.invalidateQueries(['subjects']);
             toast.success(data.message);
         },

@@ -4,7 +4,6 @@ async function getRequest(url) {
     });
     if (!res.ok) {
         const { message } = await res.json();
-        console.log(message);
         throw new Error(message || 'Failed to fetch data');
     }
     return await res.json();

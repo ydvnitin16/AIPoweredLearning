@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { CheckCircle, Pencil, Trash2 } from 'lucide-react';
 import { UseSelectedSubjectTopic } from '../../stores/UseSelectedSubjectTopic';
-import CardLoading from '../../components/common/CardLoading';
+import DynamicLoader from '../../components/common/DynamicLoader';
 import { UseAuthStore } from '../../stores/UseAuthStore';
 
 const RenderTopicsList = ({
@@ -21,17 +21,11 @@ const RenderTopicsList = ({
     const userStore = UseAuthStore((state) => state.userStore);
 
     if (!topics?.length && loadingQueue > 0) {
-        return <CardLoading msg={msg} />;
+        return <DynamicLoader variant="card" count={6} msg={msg} />;
     }
 
     if (isLoading) {
-        return (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 p-4">
-                {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                    <CardLoading />
-                ))}
-            </div>
-        );
+        return <DynamicLoader variant="card" count={6} />;
     }
 
     if (isError) {
@@ -107,7 +101,7 @@ const RenderTopicsList = ({
                         )}
                     </div>
                 ))}
-                {loadingQueue > 0 && <CardLoading msg={msg} />}
+                {loadingQueue > 0 && <DynamicLoader variant="card" msg={msg} />}
             </div>
         </>
     );

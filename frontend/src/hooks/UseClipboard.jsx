@@ -11,7 +11,6 @@ export const useClipboard = () => {
             toast.success('Copied to Clipboard share this and import');
             setTimeout(() => setCopied(false), 10000);
         } catch (err) {
-            console.error('Failed to copy!', err);
             toast.error('Failed to copy');
         }
     };

@@ -28,7 +28,6 @@ export const useDeleteImportedSubject = () => {
             return data
         },
         onSuccess: (data) => {
-            console.log(data)
             queryClient.invalidateQueries(['imported-subjects']);
             toast.success(data.message);
         },

@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import ContentEditor from '../topicCreation/ContentEditor';
-import FlashcardBuilder from '../topicCreation/FlashcardBuilder';
-import QuizBuilder from '../topicCreation/Quizbuilder';
-import PracticeBuilder from '../topicCreation/Practicebuilder';
-import RevisionEditor from '../topicCreation/RevisionEditor';
-import PreviewPanel from '../topicCreation/PreviewPanel';
+import { useState, Suspense, lazy } from 'react';
 import { useCreateTopic } from '../../hooks/UseCreateTopic';
+import Loading from '../common/Loading';
+
+// Lazy load topic creation components
+const ContentEditor = lazy(() => import('../topicCreation/ContentEditor'));
+const FlashcardBuilder = lazy(() => import('../topicCreation/FlashcardBuilder'));
+const QuizBuilder = lazy(() => import('../topicCreation/Quizbuilder'));
+const PracticeBuilder = lazy(() => import('../topicCreation/Practicebuilder'));
+const RevisionEditor = lazy(() => import('../topicCreation/RevisionEditor'));
+const PreviewPanel = lazy(() => import('../topicCreation/PreviewPanel'));
 
 export default function CreateTopicForm({ subjectId }) {
     const { createTopic, loading, error, success } = useCreateTopic();
@@ -33,7 +36,6 @@ export default function CreateTopicForm({ subjectId }) {
 
   output.content.forEach((block, idx) => {
       if (block.type === "image" && block.data?.file) {
-          console.log(block.data.file)
           formData.append("images", block.data.file);
       block.data = { placeholder: `image-${idx}` };
     }
@@ -41,14 +43,7 @@ export default function CreateTopicForm({ subjectId }) {
 
   formData.append("output", JSON.stringify(output));
   
-
-  console.log("📦 Sending FormData entries:");
-  for (let [key, val] of formData.entries()) {
-    console.log(key, val);
-  }
-
   const result = await createTopic(formData);
-  console.log("✅ Result:", result);
 };
 
 
@@ -71,31 +66,43 @@ export default function CreateTopicForm({ subjectId }) {
             </div>
 
             {/* Builders */}
-            <ContentEditor content={content} setContent={setContent} />
-            <FlashcardBuilder
-                flashcards={flashcards}
-                setFlashcards={setFlashcards}
-            />
-            <QuizBuilder quizzes={quizzes} setQuizzes={setQuizzes} />
-            <PracticeBuilder
-                practice={practiceQuestions}
-                setPractice={setPracticeQuestions}
-            />
-            <RevisionEditor revision={revision} setRevision={setRevision} />
+            <Suspense fallback={<Loading />}>
+                <ContentEditor content={content} setContent={setContent} />
+            </Suspense>
+            <Suspense fallback={<Loading />}>
+                <FlashcardBuilder
+                    flashcards={flashcards}
+                    setFlashcards={setFlashcards}
+                />
+            </Suspense>
+            <Suspense fallback={<Loading />}>
+                <QuizBuilder quizzes={quizzes} setQuizzes={setQuizzes} />
+            </Suspense>
+            <Suspense fallback={<Loading />}>
+                <PracticeBuilder
+                    practice={practiceQuestions}
+                    setPractice={setPracticeQuestions}
+                />
+            </Suspense>
+            <Suspense fallback={<Loading />}>
+                <RevisionEditor revision={revision} setRevision={setRevision} />
+            </Suspense>
 
             {/* Preview */}
             <div className="border rounded-xl bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-700 p-4">
                 <h3 className="text-lg font-semibold mb-3 text-zinc-800 dark:text-zinc-100">
                     Preview
                 </h3>
-                <PreviewPanel
-                    title={title}
-                    content={content}
-                    flashcards={flashcards}
-                    quizzes={quizzes}
-                    practice={practiceQuestions}
-                    revision={revision}
-                />
+                <Suspense fallback={<Loading />}>
+                    <PreviewPanel
+                        title={title}
+                        content={content}
+                        flashcards={flashcards}
+                        quizzes={quizzes}
+                        practice={practiceQuestions}
+                        revision={revision}
+                    />
+                </Suspense>
             </div>
 
             {/* Save Button */}

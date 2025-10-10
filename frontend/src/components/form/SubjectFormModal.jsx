@@ -25,7 +25,7 @@ export default function SubjectFormModal({
             await mutation.mutateAsync({ title: data.title });
             reset();
         } catch (err) {
-            console.log(err);
+            // Handle error silently
         } finally {
             setSubjectCreatingQueue((prev) => prev - 1);
         }

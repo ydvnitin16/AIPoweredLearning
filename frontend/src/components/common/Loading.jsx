@@ -1,16 +1,30 @@
 import React from 'react';
 
-const Loading = () => {
-    return (
-        <>
-            <div className="absolute w-screen h-screen flex justify-center items-center bg-black opacity-40 z-100">
-                <div className="flex flex-row gap-2">
-                    <div className="w-4 h-4 rounded-full bg-green-400 animate-bounce"></div>
-                    <div className="w-4 h-4 rounded-full bg-green-400 animate-bounce [animation-delay:-.3s]"></div>
-                    <div className="w-4 h-4 rounded-full bg-green-400 animate-bounce [animation-delay:-.5s]"></div>
-                </div>
+// Loading fallback used inside Suspense. By default it renders an inline
+// non-blocking spinner so pages don't get a full gray overlay. To keep the
+// previous behavior you can pass `fullscreen={true}`.
+const Loading = ({ fullscreen = false }) => {
+    const dots = (
+        <div className="flex flex-row gap-2 items-center">
+            <div className="w-3.5 h-3.5 rounded-full bg-green-400 animate-bounce" />
+            <div className="w-3.5 h-3.5 rounded-full bg-green-400 animate-bounce" style={{ animationDelay: '-0.2s' }} />
+            <div className="w-3.5 h-3.5 rounded-full bg-green-400 animate-bounce" style={{ animationDelay: '-0.4s' }} />
+        </div>
+    );
+
+    if (fullscreen) {
+        return (
+            <div className="fixed inset-0 flex justify-center items-center bg-black/40 z-[1000]">
+                {dots}
             </div>
-        </>
+        );
+    }
+
+    // Inline non-blocking spinner — places a small spinner where the fallback is used
+    return (
+        <div className="flex justify-center items-center p-3">
+            {dots}
+        </div>
     );
 };
 

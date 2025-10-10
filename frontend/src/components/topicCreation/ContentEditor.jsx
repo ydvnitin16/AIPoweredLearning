@@ -5,12 +5,28 @@ import ContentRenderer from '../topics/ContentRenderer';
 export default function ContentEditor({ content, setContent }) {
     const codeLanguages = [
         { lang: 'javascript', extension: 'js' },
+        { lang: 'jsx', extension: 'jsx' },
+        { lang: 'typescript', extension: 'ts' },
+        { lang: 'tsx', extension: 'tsx' },
         { lang: 'python', extension: 'py' },
         { lang: 'java', extension: 'java' },
+        { lang: 'c', extension: 'c' },
         { lang: 'c++', extension: 'cpp' },
         { lang: 'c#', extension: 'cs' },
         { lang: 'ruby', extension: 'rb' },
         { lang: 'go', extension: 'go' },
+        { lang: 'php', extension: 'php' },
+        { lang: 'rust', extension: 'rs' },
+        { lang: 'kotlin', extension: 'kt' },
+        { lang: 'swift', extension: 'swift' },
+        { lang: 'scala', extension: 'scala' },
+        { lang: 'sql', extension: 'sql' },
+        { lang: 'bash', extension: 'sh' },
+        { lang: 'shell', extension: 'bash' },
+        { lang: 'yaml', extension: 'yml' },
+        { lang: 'json', extension: 'json' },
+        { lang: 'markdown', extension: 'md' },
+        { lang: 'plaintext', extension: 'txt' },
     ];
 
     const supportedTypes = [
@@ -58,7 +74,6 @@ export default function ContentEditor({ content, setContent }) {
         const updated = [...content];
         updated[idx][key] = value;
         setContent(updated);
-        console.log(content);
     };
 
     const handleFileChange = (idx, file) => {

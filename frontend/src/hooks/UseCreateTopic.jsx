@@ -18,14 +18,12 @@ export function useCreateTopic() {
     });
 
     const data = await res.json(); // will fail if backend responds with non-JSON
-    console.log(data)
     if (!res.ok) throw new Error(data.message || "Failed to create topic");
 
     setSuccess(true);
     return data;
   } catch (err) {
     setError(err.message);
-    console.error("❌ Error creating topic:", err);
     return null;
   } finally {
     setLoading(false);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import {
     Plus,
     BookOpen,
@@ -9,13 +9,16 @@ import {
     Import,
     Book,
 } from 'lucide-react';
-import SubjectFormModal from '../components/form/SubjectFormModal.jsx';
-import ImportSubject from '../components/form/ImportSubject.jsx';
 import { useDeleteSubject, useSubjects } from '../hooks/UseSubjects.jsx';
 import { useDeleteImportedSubject, useImportedSubjects } from '../hooks/UseImportedSubjects.jsx';
 import { usePublicSubjects } from '../hooks/UsePublicSubjects.jsx';
 import RenderSubjectList from '../components/subject/RenderSubjectList.jsx';
 import SubjectNav from '../components/common/SubjectNav.jsx';
+import Loading from '../components/common/Loading.jsx';
+
+// Lazy load modal components
+const SubjectFormModal = lazy(() => import('../components/form/SubjectFormModal.jsx'));
+const ImportSubject = lazy(() => import('../components/form/ImportSubject.jsx'));
 
 export default function Dashboard() {
     const [isSubjectModalOpen, setIsSubjectModalOpen] = useState();
@@ -29,16 +32,20 @@ export default function Dashboard() {
 
     return (
         <>
-            <SubjectFormModal
-                setSubjectCreatingQueue={setSubjectCreatingQueue}
-                isOpen={isSubjectModalOpen}
-                onClose={() => setIsSubjectModalOpen(false)}
-            />
-            <ImportSubject
-                setSubjectImportingQueue={setSubjectImportingQueue}
-                isOpen={isImportModalOpen}
-                onClose={() => setIsImportModalOpen(false)}
-            />
+            <Suspense fallback={<Loading />}>
+                <SubjectFormModal
+                    setSubjectCreatingQueue={setSubjectCreatingQueue}
+                    isOpen={isSubjectModalOpen}
+                    onClose={() => setIsSubjectModalOpen(false)}
+                />
+            </Suspense>
+            <Suspense fallback={<Loading />}>
+                <ImportSubject
+                    setSubjectImportingQueue={setSubjectImportingQueue}
+                    isOpen={isImportModalOpen}
+                    onClose={() => setIsImportModalOpen(false)}
+                />
+            </Suspense>
             <div className="min-h-screen bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors dark:bg-black">
                 {/* Top Navigation */}
                 <SubjectNav

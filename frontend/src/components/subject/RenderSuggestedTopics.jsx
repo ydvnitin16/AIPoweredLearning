@@ -32,7 +32,7 @@ const RenderSuggestedTopics = ({ setTopicGeneratingQueue, topics }) => {
                 subjectId: selectedSubject?._id,
             });
         } catch (err) {
-            console.log(err);
+            // Handle error silently
         } finally {
             setTopicGeneratingQueue((prev) => prev - 1);
             setisGenerating(false);
@@ -77,8 +77,9 @@ const RenderSuggestedTopics = ({ setTopicGeneratingQueue, topics }) => {
             </p>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-6">
-                {selectedSubject?.suggestedTopics?.map((topicName) => (
+                {selectedSubject?.suggestedTopics?.map((topicName, idx) => (
                     <SuggestedTopicCard
+                    key={idx}
                         topicName={topicName}
                         onGenerate={handleGenerate}
                     />

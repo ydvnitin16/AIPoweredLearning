@@ -1,23 +1,21 @@
 // components/ContentRenderer.jsx
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import {
-    vs,
     vscDarkPlus,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import Viz from 'viz.js';
 import { Module, render } from 'viz.js/full.render.js';
 
-import ReactFlow, { MiniMap, Controls, Background } from 'reactflow';
+import ReactFlow, { Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-// Formula rendering (using KaTeX/MathJax, choose one; here I’ll show KaTeX)
 import 'katex/dist/katex.min.css';
-import { BlockMath, InlineMath } from 'react-katex';
+import { BlockMath } from 'react-katex';
 
 const ContentRenderer = ({ obj, idx }) => {
     const vizRef = useRef(null);
@@ -31,7 +29,9 @@ const ContentRenderer = ({ obj, idx }) => {
                 vizRef.current.innerHTML = '';
                 vizRef.current.appendChild(svgElement);
             })
-            .catch((err) => console.error(err));
+            .catch((err) => {
+                // Handle error silently or show user-friendly message
+            });
     };
 
     const components = {
@@ -122,7 +122,6 @@ const ContentRenderer = ({ obj, idx }) => {
             useEffect(() => {
                 if (!obj.data) return;
                 const fromattedDOT = obj.data.replace(/\\n/g, '\n');
-                console.log(fromattedDOT);
                 renderViz(fromattedDOT); // obj.data should be valid DOT code
             }, [obj.data]);
 

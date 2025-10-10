@@ -45,8 +45,6 @@ const Signup = () => {
 
     // Form submission
     const onSubmit = async (data) => {
-        console.log('Form Submitted:', data);
-
         try {
             setLoading(true);
             const res = await authUser('register', data);
