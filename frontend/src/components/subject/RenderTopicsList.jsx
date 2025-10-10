@@ -77,7 +77,7 @@ const RenderTopicsList = ({
                         {userStore.id === selectedSubject?.createdBy && (
                             <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition">
                                 <button
-                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-zinc-700"
+                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-indigo-100 dark:hover:bg-zinc-700 cursor-no-drop"
                                     onClick={(e) => e.stopPropagation()}
                                 >
                                     <Pencil
@@ -86,7 +86,7 @@ const RenderTopicsList = ({
                                     />
                                 </button>
                                 <button
-                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700"
+                                    className="p-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-red-100 dark:hover:bg-zinc-700 cursor-pointer"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         deleteTopic.mutate(topic._id);
