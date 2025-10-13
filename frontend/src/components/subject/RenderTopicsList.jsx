@@ -20,10 +20,6 @@ const RenderTopicsList = ({
     );
     const userStore = UseAuthStore((state) => state.userStore);
 
-    if (!topics?.length && loadingQueue > 0) {
-        return <DynamicLoader variant="card" count={6} msg={msg} />;
-    }
-
     if (isLoading) {
         return <DynamicLoader variant="card" count={6} />;
     }
@@ -37,7 +33,7 @@ const RenderTopicsList = ({
         );
     }
 
-    if (!topics?.length) {
+    if (!topics?.length && !loadingQueue) {
         return (
             <div className="col-span-full text-zinc-600 dark:text-zinc-400">
                 No Topics yet—click “Add Topic” to create your first one.

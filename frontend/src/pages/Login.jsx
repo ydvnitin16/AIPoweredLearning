@@ -61,7 +61,7 @@ const Login = () => {
 
     return (
         <>
-            {loading && <Loading />}
+            {loading && <Loading fullscreen={true} />}
             <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-900 px-4">
                 <div className="flex flex-col md:flex-row w-full max-w-4xl bg-white dark:bg-zinc-700 rounded-xl overflow-hidden shadow-lg">
                     {/* Left Image Section */}

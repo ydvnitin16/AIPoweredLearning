@@ -37,6 +37,7 @@ const MainLayout = () => {
             clearUserStore();
             toast.success(data.message);
             queryClient.invalidateQueries({ queryKey: ['subjects'] });
+            setIsLogoutModalOpen(false)
             navigate('/login');
         } catch (err) {
             toast.error('Failed to logout Sorry!');

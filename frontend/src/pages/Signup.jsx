@@ -68,7 +68,7 @@ const Signup = () => {
 
     return (
         <>
-            {loading && <Loading />}
+            {loading && <Loading fullscreen={true} />}
             <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-zinc-900 px-4">
                 <div className="flex flex-col md:flex-row w-full dark:bg-zinc-700 max-w-5xl bg-white rounded-xl overflow-hidden shadow-lg">
                     {/* Left: Register Form */}
