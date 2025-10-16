@@ -88,7 +88,7 @@ const RenderSubjectList = ({
                     )}
                 </div>
             ))}
-            {!loadingQueue > 0 && <DynamicLoader variant="card" msg={msg} />}
+            {loadingQueue > 0 && <DynamicLoader variant="card" msg={msg} />}
         </div>
     );
 };
